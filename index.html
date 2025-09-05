@@ -6,28 +6,158 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PianoPal — Learn Piano</title>
   <style>
-    :root { --ink:#1e1b4b; --panel:#ffffffcc; --shadow: 0 10px 30px rgba(0,0,0,.08); }
-    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; background: linear-gradient(135deg,#e0f2fe,#e9d5ff); color:var(--ink); }
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+    
+    :root { 
+      --ink:#1e1b4b; 
+      --panel:#ffffffcc; 
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+      --fun-font: 'Fredoka', 'Comic Sans MS', cursive;
+      --big-button: #ff6b6b;
+      --big-button-hover: #ff5252;
+      --small-button: #4f46e5;
+    }
+    
+    body { 
+      margin:0; 
+      font-family: var(--fun-font); 
+      background: linear-gradient(135deg,#e0f2fe,#e9d5ff,#fef3c7); 
+      color:var(--ink);
+      min-height: 100vh;
+    }
+    
     .wrap { max-width: 1040px; margin: 0 auto; padding: 24px; }
     .card { background: var(--panel); border: 1px solid #e5e7eb; border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
-    .btn { background:#4f46e5; color:#fff; border:none; border-radius:14px; padding:12px 16px; font-weight:700; cursor:pointer; }
+    
+    /* Big fun buttons for song selection */
+    .big-btn { 
+      background: var(--big-button); 
+      color: #fff; 
+      border: none; 
+      border-radius: 20px; 
+      padding: 24px 32px; 
+      font-size: 24px; 
+      font-weight: 700; 
+      font-family: var(--fun-font);
+      cursor: pointer; 
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+    }
+    .big-btn:hover { 
+      background: var(--big-button-hover); 
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4);
+    }
+    
+    /* Regular buttons */
+    .btn { 
+      background: var(--small-button); 
+      color: #fff; 
+      border: none; 
+      border-radius: 14px; 
+      padding: 12px 16px; 
+      font-weight: 700; 
+      font-family: var(--fun-font);
+      cursor: pointer; 
+    }
     .btn:disabled { opacity:.6; cursor:not-allowed; }
-    .pill { display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; }
-    .pill.active { outline:3px solid #a5b4fc; }
+    
+    /* Small pills for options */
+    .pill { 
+      display: inline-block; 
+      padding: 8px 16px; 
+      border-radius: 999px; 
+      border: 2px solid #e5e7eb; 
+      background: #fff; 
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--fun-font);
+      transition: all 0.2s ease;
+    }
+    .pill.active { 
+      border-color: var(--small-button);
+      background: var(--small-button);
+      color: white;
+    }
+    .pill:hover { transform: translateY(-1px); }
+    
+    /* Layout helpers */
     .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
     .grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:12px; }
+    .center { text-align: center; }
+    .top-options { margin-bottom: 32px; padding: 16px; background: rgba(255,255,255,0.7); border-radius: 16px; }
+    .song-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 32px 0; }
+    
+    /* Typography improvements */
+    h1 { font-size: 48px; margin: 0; font-weight: 700; color: var(--big-button); text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+    h2 { font-size: 36px; margin-top: 0; font-weight: 600; color: var(--ink); }
+    h3 { font-size: 20px; margin-top: 16px; font-weight: 600; color: var(--ink); }
+    
+    /* Page-specific styles */
+    .welcome-page { text-align: center; min-height: 60vh; display: flex; flex-direction: column; justify-content: center; }
+    .name-input { 
+      font-size: 20px; 
+      padding: 16px 24px; 
+      border-radius: 16px; 
+      border: 3px solid #e5e7eb;
+      font-family: var(--fun-font);
+      margin: 20px 0;
+      max-width: 300px;
+    }
+    .name-input:focus { border-color: var(--big-button); outline: none; }
+    
+    /* Existing game styles */
     .kbd { user-select:none; display:flex; gap:6px; padding:10px; border-radius:18px; border:1px solid #e5e7eb; background:#ffffffcf; box-shadow: inset 0 6px 14px rgba(0,0,0,.05); overflow-x:auto; }
     .white { position:relative; flex:1 1 0; height:120px; min-width:44px; border-radius:12px; background:#fff; border:1px solid #e5e7eb; box-shadow: inset 0 -2px 0 #e5e7eb; }
     .white .lbl { position:absolute; bottom:6px; width:100%; text-align:center; font-size:12px; font-weight:700; }
     .timeline { height:72px; border-radius:16px; background:#ffffffcf; border:1px solid #e5e7eb; padding:8px; display:flex; gap:8px; overflow:hidden; }
     .noteBlock { min-width:12%; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; box-shadow: var(--shadow); }
+    /* Enhanced star animation with platform jumping */
     .scene { position:relative; height:240px; border-radius:20px; overflow:hidden; background: linear-gradient(180deg,#0b102d,#1e3a8a); box-shadow: inset 0 -40px 80px rgba(0,0,0,.3); }
     .bed { position:absolute; left:0; right:0; bottom:0; height:56px; background: #fde68a99; backdrop-filter: blur(2px); }
     .plat { position:absolute; left:24px; right:24px; height:4px; background:#ffffff66; border-radius:999px; }
-    .star { position:absolute; left:50%; transform:translateX(-50%); width:70px; transition: transform .35s cubic-bezier(.2,.9,.2,1); }
-    @keyframes twinkle { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .star { 
+      position:absolute; 
+      left:50%; 
+      transform:translateX(-50%); 
+      width:70px; 
+      transition: transform .6s cubic-bezier(.68,-0.55,.265,1.55); 
+      z-index: 10;
+    }
+    
+    /* Enhanced platform jumping animation */
+    @keyframes starJump {
+      0% { transform: translateX(-50%) translateY(0px) scale(1) rotate(0deg); }
+      15% { transform: translateX(-50%) translateY(-10px) scale(1.1) rotate(-5deg); }
+      30% { transform: translateX(-50%) translateY(0px) scale(1) rotate(0deg); }
+      100% { transform: translateX(-50%) translateY(0px) scale(1) rotate(0deg); }
+    }
+    
+    .star.jumping { animation: starJump 0.6s cubic-bezier(.68,-0.55,.265,1.55); }
+    
+    @keyframes twinkle { 
+      0%,100%{opacity:1; filter: brightness(1) drop-shadow(0 0 10px #ffd26a);} 
+      50%{opacity:.7; filter: brightness(1.3) drop-shadow(0 0 20px #f59e0b);} 
+    }
     .twinkle { animation: twinkle 1.2s ease-in-out infinite; }
-    .small { transform: translateX(-50%) scale(.4) translateY(0) !important; }
+    
+    @keyframes finalCelebration {
+      0% { transform: translateX(-50%) scale(.4) rotate(0deg); filter: brightness(1); }
+      25% { transform: translateX(-50%) scale(.5) rotate(90deg); filter: brightness(1.2); }
+      50% { transform: translateX(-50%) scale(.4) rotate(180deg); filter: brightness(1.4); }
+      75% { transform: translateX(-50%) scale(.5) rotate(270deg); filter: brightness(1.2); }
+      100% { transform: translateX(-50%) scale(.4) rotate(360deg); filter: brightness(1); }
+    }
+    
+    .small { 
+      transform: translateX(-50%) scale(.4) translateY(-150px) !important; 
+      animation: finalCelebration 2s ease-in-out infinite;
+    }
     .feedback { text-align:center; font-weight:700; }
     .muted { color:#4338ca; opacity:.85; }
     .hidden { display:none; }
@@ -36,60 +166,67 @@
 </head>
 <body>
   <div class="wrap">
-    <header class="row" style="justify-content:space-between;margin-bottom:16px">
-      <h1 style="margin:0;font-size:28px">PianoPal</h1>
-      <div class="muted">One‑octave or multi‑octave (strict) kids piano</div>
-    </header>
-
-    <section id="welcome" class="card">
-      <h2 style="margin-top:0">Hello! Time to learn Piano 🎹</h2>
-      <div class="row">
-        <label>Name: <input id="name" placeholder="Your name" /></label>
+    <!-- Page 1: Welcome & Name -->
+    <section id="welcome" class="welcome-page">
+      <h1>🎹 PianoPal</h1>
+      <h2>Hello! Time to learn Piano.</h2>
+      <h2>What's your name?</h2>
+      <div class="center">
+        <input id="name" class="name-input" placeholder="Your name" maxlength="20" />
+        <br>
+        <button id="nextToSongs" class="big-btn" style="margin-top: 24px;">Let's Go! 🚀</button>
       </div>
-
-      <h3>Choose input</h3>
-      <div class="grid2">
-        <button class="pill active" id="modeMic">Microphone</button>
-        <button class="pill" id="modeMIDI">MIDI Keyboard</button>
-      </div>
-
-      <h3 style="margin-top:16px">Difficulty</h3>
-      <div class="grid2">
-        <button class="pill active" id="easyMode">Easy — single octave (C4–B4)</button>
-        <button class="pill" id="strictMode">Strict — match octaves (C1–B7)</button>
-      </div>
-
-      <h3 style="margin-top:16px">Song</h3>
-      <div class="row">
-        <select id="songSelect">
-          <option value="twinkle">Twinkle Twinkle Little Star</option>
-          <option value="mary">Mary Had a Little Lamb</option>
-          <option value="uploaded">Use uploaded file</option>
-        </select>
-        <input type="file" id="file" accept=".mid,.midi,.musicxml,.xml" />
-      </div>
-
-      <div class="row" style="margin-top:16px">
-        <label class="row"><input type="checkbox" id="toggleSamples"/> Play note audio on correct input</label>
-        <label class="row"><input type="checkbox" id="toggleGuide"/> Auto‑play guide note before each prompt</label>
-      </div>
-
-      <div class="row" style="margin-top:16px">
-        <button id="start" class="btn">Start!</button>
-        <span class="muted">(or use the built‑in songs)</span>
-      </div>
-
-      <details style="margin-top:16px"><summary><b>Audio samples</b> (optional)</summary>
-        <div class="card" style="margin-top:8px">
-          Place your samples in <code>/samples/</code> and name them like <code>C4.mp3</code>, <code>F#3.ogg</code>, <code>Bb2.wav</code>. Accidentals are supported for future harder songs.
-        </div>
-      </details>
     </section>
 
+    <!-- Page 2: Song Selection -->
+    <section id="songSelection" class="hidden">
+      <h1 class="center">🎹 PianoPal</h1>
+      
+      <!-- Small options at top -->
+      <div class="top-options">
+        <div class="row" style="justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-weight: 600; margin-right: 12px;">Input:</span>
+            <button class="pill active" id="modeMic">🎤 Microphone</button>
+            <button class="pill" id="modeMIDI">🎹 MIDI Keyboard</button>
+          </div>
+          <div>
+            <span style="font-weight: 600; margin-right: 12px;">Difficulty:</span>
+            <button class="pill active" id="easyMode">Easy</button>
+            <button class="pill" id="strictMode">Strict</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Big song choice buttons -->
+      <div class="center">
+        <h2>Choose Your Song! 🎵</h2>
+        <div class="song-grid">
+          <button class="big-btn" id="chooseTwinkle">
+            ⭐ Twinkle Twinkle Little Star
+          </button>
+          <button class="big-btn" id="chooseMary">
+            🐑 Mary Had a Little Lamb  
+          </button>
+        </div>
+        
+        <div style="margin-top: 32px;">
+          <h3>Or upload your own MIDI file:</h3>
+          <input type="file" id="file" accept=".mid,.midi" style="margin: 16px 0;" />
+          <button id="startWithUpload" class="btn" style="margin-left: 12px;">Play Uploaded Song</button>
+        </div>
+      </div>
+      
+      <div class="center" style="margin-top: 32px;">
+        <button id="backToWelcome" class="btn">← Back</button>
+      </div>
+    </section>
+
+    <!-- Page 3: Game Interface -->
     <section id="play" class="hidden">
       <div class="row" style="justify-content:space-between;margin-bottom:8px">
         <div><b id="songTitle">Twinkle Twinkle Little Star</b></div>
-        <button class="pill" id="back">Back</button>
+        <button class="pill" id="back">← Back to Songs</button>
       </div>
 
       <div class="scene" id="scene">
@@ -120,7 +257,9 @@
       </div>
     </section>
 
-    <footer style="margin-top:16px" class="muted">No data is stored after reload. Session-only best/last times are cleared when you close or refresh the page.</footer>
+    <footer style="margin-top:16px" class="muted center">
+      Made with ❤️ for young pianists! No data is stored after reload.
+    </footer>
   </div>
 
 <script>
@@ -177,6 +316,7 @@ function dir(target, got){ return got<target ? 'Try again but higher' : 'Try aga
 
 // UI refs
 const welcome = el('welcome');
+const songSelection = el('songSelection');
 const play = el('play');
 const kbd = el('kbd');
 const prompt = el('prompt');
@@ -189,26 +329,33 @@ const bestLbl = el('best');
 const lastLbl = el('last');
 const songTitleLbl = el('songTitle');
 
-// Controls wiring
+// Controls wiring - Updated for new page flow
 el('modeMic').onclick = (e)=>{ pick('mode','mic',['modeMic','modeMIDI'],e)};
 el('modeMIDI').onclick = (e)=>{ pick('mode','midi',['modeMic','modeMIDI'],e)};
 el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','strictMode'],e)};
 el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','strictMode'],e)};
-el('start').onclick = startGame;
-el('back').onclick = ()=>{ stopInputs(); reset(); swap(play,welcome); };
+
+// New page navigation
+el('nextToSongs').onclick = ()=>{ 
+  state.name = el('name').value.trim(); 
+  swap(welcome, songSelection); 
+};
+el('backToWelcome').onclick = ()=>{ swap(songSelection, welcome); };
+el('chooseTwinkle').onclick = ()=>{ startGameWithSong('twinkle'); };
+el('chooseMary').onclick = ()=>{ startGameWithSong('mary'); };
+el('startWithUpload').onclick = ()=>{ 
+  const file = el('file').files[0];
+  if(file) {
+    onFile({target: {files: [file]}});
+  } else {
+    alert('Please select a MIDI file first!');
+  }
+};
+el('back').onclick = ()=>{ stopInputs(); reset(); swap(play, songSelection); };
 el('file').addEventListener('change', onFile);
-el('songSelect').addEventListener('change', onSongChange);
 
 function onSongChange(e){
-  state.songKey = e.target.value;
-  if(state.songKey!=='uploaded'){
-    const s = SONGS[state.songKey];
-    songTitleLbl.textContent = s.title;
-    state.queue = s.notes.map(toObj);
-  } else {
-    songTitleLbl.textContent = 'Uploaded Song';
-  }
-  renderPrompt(); renderTimeline(); renderKeyboard();
+  // Removed - no longer needed with button-based selection
 }
 
 function pick(key,val,ids,e){
@@ -227,16 +374,22 @@ function reset(){
   updateTimes();
 }
 
+function startGameWithSong(songKey) {
+  state.songKey = songKey;
+  const song = SONGS[songKey];
+  songTitleLbl.textContent = song.title;
+  state.queue = song.notes.map(toObj);
+  startGame();
+}
+
 function startGame(){
-  state.name = el('name').value.trim();
+  if(!state.name) state.name = el('name').value.trim();
   modeLbl.textContent = state.mode==='mic'?'Microphone':'MIDI';
   reset();
-  swap(welcome, play);
+  swap(songSelection, play);
   startTimer();
   if(state.mode==='mic') startMic(); else startMIDI();
-  if(document.getElementById('toggleGuide').checked){
-    const exp = state.expected(); if(exp) playSample(exp.step, exp.octave, true);
-  }
+  // Removed guide auto-play functionality
 }
 
 // ----- Timeline & Prompt -----
@@ -287,16 +440,43 @@ function renderKeyboard(active){
   }
 }
 
-// ----- Star animation -----
+// ----- Enhanced Star Animation with Platform Jumping -----
 function placeStar(){
   const total = state.queue.length || 1;
   const progress = Math.min(state.idx/total,1);
-  const baseY = 180; // px up from bottom
-  const y = baseY - progress*150;
-  const scale = 1 - progress*0.6;
+  
+  // Platform positions from bottom: ground, 28px, 68px, 108px, 148px, 188px (top of sky)
+  const platforms = [180, 152, 112, 72, 32, -8]; // Y positions for star (accounting for star height)
+  const currentPlatform = Math.floor(progress * (platforms.length - 1));
+  const nextPlatform = Math.min(currentPlatform + 1, platforms.length - 1);
+  
+  // Interpolate between platforms for smooth movement between jumps
+  const platformProgress = (progress * (platforms.length - 1)) - currentPlatform;
+  const y = platforms[currentPlatform] + (platforms[nextPlatform] - platforms[currentPlatform]) * platformProgress;
+  
+  const scale = 1 - progress * 0.6;
+  
+  // Remove jumping class to reset animation
+  star.classList.remove('jumping');
+  
+  // Set position
   star.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`;
-  if(state.finished){ star.classList.add('twinkle'); star.classList.add('small'); }
-  else { star.classList.remove('twinkle'); star.classList.remove('small'); }
+  
+  // Add jumping animation when moving to next note (but not on first note)
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    setTimeout(() => star.classList.add('jumping'), 50);
+    setTimeout(() => star.classList.remove('jumping'), 650);
+  }
+  
+  if(state.finished){ 
+    star.classList.add('twinkle'); 
+    star.classList.add('small'); 
+    // Add extra sparkle effect for completion
+    feedback.textContent = `🌟 Amazing job${state.name?`, ${state.name}`:''}! You completed the song! 🌟`;
+  } else { 
+    star.classList.remove('twinkle'); 
+    star.classList.remove('small'); 
+  }
 }
 
 // ----- Timer & session best/last -----
@@ -364,16 +544,8 @@ function autoCorrelate(buf, sr){
   if(bestCorr>0.01) return sr/best; return -1;
 }
 
-// ----- Sample Playback -----
-const useSamples = ()=> document.getElementById('toggleSamples').checked;
-async function playSample(step, octave, guide=false){
-  if(!useSamples() && !guide) return;
-  const name = `${step}${octave}`.replace('##','#'); // e.g., C#4
-  const candidates = [`samples/${name}.mp3`, `samples/${name}.ogg`, `samples/${name}.wav`];
-  for(const u of candidates){
-    try{ const r = await fetch(u, {method:'HEAD'}); if(r.ok){ const audio = new Audio(u); audio.play(); return; } }catch(e){}
-  }
-}
+// ----- Sample Playback REMOVED -----
+// Audio samples functionality has been removed as requested
 
 // ----- Correctness Logic -----
 function handleIncomingMidi(midi){
@@ -390,32 +562,60 @@ function handleIncomingMidi(midi){
 }
 
 function onCorrect(stepWhite, octave){
-  playSample(stepWhite, octave);
-  state.idx++; feedback.textContent = `Great job${state.name?`, ${state.name}`:''}!`;
+  // Removed playSample call
+  state.idx++; 
+  
+  // Fun feedback messages for children
+  const encouragements = [
+    "Awesome! 🎉", "Great job! ⭐", "Fantastic! 🌟", "Well done! 🎵", 
+    "Perfect! 🎹", "Amazing! 🚀", "Brilliant! ✨", "Excellent! 🏆"
+  ];
+  const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+  feedback.textContent = `${randomEncouragement}${state.name ? ` ${state.name}!` : ''}`;
+  
   if(state.idx>=state.queue.length){
     state.finished=true; renderPrompt(); renderTimeline(); placeStar(); stopTimerAndRecord(); return;
   }
   renderPrompt(); renderTimeline(); placeStar();
-  if(document.getElementById('toggleGuide').checked){
-    const exp = state.expected(); if(exp) setTimeout(()=>playSample(exp.step, exp.octave, true), 180);
-  }
+  // Removed guide playback
 }
-function onWrong(msg){ feedback.textContent = msg; }
 
-// ----- File Loading (MIDI / MusicXML) -----
-async function onFile(e){ const f=e.target.files[0]; if(!f) return; const name=f.name.toLowerCase(); try{
-  let seq=null; if(name.endsWith('.mid')||name.endsWith('.midi')) seq=await parseMIDI(f); else if(name.endsWith('.musicxml')||name.endsWith('.xml')) seq=await parseMusicXML(f); else { alert('Unsupported file. Use .mid/.midi or .musicxml'); return; }
-  if(!seq || !seq.length){ alert('No notes found.'); return; }
-  state.songKey='uploaded';
-  songTitleLbl.textContent = f.name.replace(/\.(mid|midi|musicxml|xml)$/i,'');
-  state.queue = postProcessSequence(seq);
-  renderPrompt(); renderTimeline(); placeStar(); renderKeyboard();
-} catch(err){ console.error(err); alert('Could not read that file. Export MIDI or MusicXML from MuseScore.'); } }
+function onWrong(msg){ 
+  // Make error messages more child-friendly
+  const friendlyMsg = msg.replace('Sorry, wrong note', 'Oops! Try a different note')
+                        .replace('try again', 'give it another try');
+  feedback.textContent = friendlyMsg; 
+}
+
+// ----- File Loading (MIDI only) -----
+async function onFile(e){ 
+  const f=e.target.files[0]; 
+  if(!f) return; 
+  const name=f.name.toLowerCase(); 
+  try{
+    let seq=null; 
+    if(name.endsWith('.mid')||name.endsWith('.midi')) {
+      seq=await parseMIDI(f); 
+    } else { 
+      alert('Only MIDI files (.mid/.midi) are supported for uploads.'); 
+      return; 
+    }
+    if(!seq || !seq.length){ alert('No notes found in MIDI file.'); return; }
+    state.songKey='uploaded';
+    songTitleLbl.textContent = f.name.replace(/\.(mid|midi)$/i,'');
+    state.queue = postProcessSequence(seq);
+    // Start the game immediately after file upload
+    startGame();
+  } catch(err){ 
+    console.error(err); 
+    alert('Could not read that MIDI file. Try exporting from MuseScore or another music program.'); 
+  } 
+}
 
 function postProcessSequence(seq){
   if(state.difficulty==='easy'){ return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave:4})); }
   // strict: keep octave (clamp 1..7)
-  return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4)))}));
+  return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4))}));
 }
 
 async function parseMIDI(file){
@@ -428,22 +628,7 @@ async function parseMIDI(file){
   return notes;
 }
 
-async function parseMusicXML(file){
-  const txt = await file.text(); const doc = new DOMParser().parseFromString(txt, 'application/xml');
-  const out=[]; const ns = doc.getElementsByTagName('note');
-  for(const n of ns){
-    if(n.getElementsByTagName('rest')[0]) continue;
-    const pitch = n.getElementsByTagName('pitch')[0]; if(!pitch) continue;
-    const step = pitch.getElementsByTagName('step')[0]?.textContent?.trim();
-    const alter = parseInt(pitch.getElementsByTagName('alter')[0]?.textContent||'0',10);
-    const octave = parseInt(pitch.getElementsByTagName('octave')[0]?.textContent||'4',10);
-    if(!step) continue;
-    let label = step; if(alter===1) label = step+'#'; if(alter===-1) { /* flats -> map to white by dropping accidental */ }
-    const white = label.replace('#','');
-    out.push({step:label, stepWhite:white, octave});
-  }
-  return out;
-}
+// MusicXML parsing removed - MIDI only now
 
 // Initial render
 renderTimeline(); renderKeyboard(); renderPrompt(); placeStar();

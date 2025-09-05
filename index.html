@@ -117,13 +117,47 @@
     .white .lbl { position:absolute; bottom:6px; width:100%; text-align:center; font-size:12px; font-weight:700; }
     .timeline { height:72px; border-radius:16px; background:#ffffffcf; border:1px solid #e5e7eb; padding:8px; display:flex; gap:8px; overflow:hidden; }
     .noteBlock { min-width:12%; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; box-shadow: var(--shadow); }
+    /* Enhanced star animation with platform jumping */
     .scene { position:relative; height:240px; border-radius:20px; overflow:hidden; background: linear-gradient(180deg,#0b102d,#1e3a8a); box-shadow: inset 0 -40px 80px rgba(0,0,0,.3); }
     .bed { position:absolute; left:0; right:0; bottom:0; height:56px; background: #fde68a99; backdrop-filter: blur(2px); }
     .plat { position:absolute; left:24px; right:24px; height:4px; background:#ffffff66; border-radius:999px; }
-    .star { position:absolute; left:50%; transform:translateX(-50%); width:70px; transition: transform .35s cubic-bezier(.2,.9,.2,1); }
-    @keyframes twinkle { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .star { 
+      position:absolute; 
+      left:50%; 
+      transform:translateX(-50%); 
+      width:70px; 
+      transition: transform .6s cubic-bezier(.68,-0.55,.265,1.55); 
+      z-index: 10;
+    }
+    
+    /* Enhanced platform jumping animation */
+    @keyframes starJump {
+      0% { transform: translateX(-50%) translateY(0px) scale(1) rotate(0deg); }
+      15% { transform: translateX(-50%) translateY(-10px) scale(1.1) rotate(-5deg); }
+      30% { transform: translateX(-50%) translateY(0px) scale(1) rotate(0deg); }
+      100% { transform: translateX(-50%) translateY(0px) scale(1) rotate(0deg); }
+    }
+    
+    .star.jumping { animation: starJump 0.6s cubic-bezier(.68,-0.55,.265,1.55); }
+    
+    @keyframes twinkle { 
+      0%,100%{opacity:1; filter: brightness(1) drop-shadow(0 0 10px #ffd26a);} 
+      50%{opacity:.7; filter: brightness(1.3) drop-shadow(0 0 20px #f59e0b);} 
+    }
     .twinkle { animation: twinkle 1.2s ease-in-out infinite; }
-    .small { transform: translateX(-50%) scale(.4) translateY(0) !important; }
+    
+    @keyframes finalCelebration {
+      0% { transform: translateX(-50%) scale(.4) rotate(0deg); filter: brightness(1); }
+      25% { transform: translateX(-50%) scale(.5) rotate(90deg); filter: brightness(1.2); }
+      50% { transform: translateX(-50%) scale(.4) rotate(180deg); filter: brightness(1.4); }
+      75% { transform: translateX(-50%) scale(.5) rotate(270deg); filter: brightness(1.2); }
+      100% { transform: translateX(-50%) scale(.4) rotate(360deg); filter: brightness(1); }
+    }
+    
+    .small { 
+      transform: translateX(-50%) scale(.4) translateY(-150px) !important; 
+      animation: finalCelebration 2s ease-in-out infinite;
+    }
     .feedback { text-align:center; font-weight:700; }
     .muted { color:#4338ca; opacity:.85; }
     .hidden { display:none; }
@@ -406,16 +440,43 @@ function renderKeyboard(active){
   }
 }
 
-// ----- Star animation -----
+// ----- Enhanced Star Animation with Platform Jumping -----
 function placeStar(){
   const total = state.queue.length || 1;
   const progress = Math.min(state.idx/total,1);
-  const baseY = 180; // px up from bottom
-  const y = baseY - progress*150;
-  const scale = 1 - progress*0.6;
+  
+  // Platform positions from bottom: ground, 28px, 68px, 108px, 148px, 188px (top of sky)
+  const platforms = [180, 152, 112, 72, 32, -8]; // Y positions for star (accounting for star height)
+  const currentPlatform = Math.floor(progress * (platforms.length - 1));
+  const nextPlatform = Math.min(currentPlatform + 1, platforms.length - 1);
+  
+  // Interpolate between platforms for smooth movement between jumps
+  const platformProgress = (progress * (platforms.length - 1)) - currentPlatform;
+  const y = platforms[currentPlatform] + (platforms[nextPlatform] - platforms[currentPlatform]) * platformProgress;
+  
+  const scale = 1 - progress * 0.6;
+  
+  // Remove jumping class to reset animation
+  star.classList.remove('jumping');
+  
+  // Set position
   star.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`;
-  if(state.finished){ star.classList.add('twinkle'); star.classList.add('small'); }
-  else { star.classList.remove('twinkle'); star.classList.remove('small'); }
+  
+  // Add jumping animation when moving to next note (but not on first note)
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    setTimeout(() => star.classList.add('jumping'), 50);
+    setTimeout(() => star.classList.remove('jumping'), 650);
+  }
+  
+  if(state.finished){ 
+    star.classList.add('twinkle'); 
+    star.classList.add('small'); 
+    // Add extra sparkle effect for completion
+    feedback.textContent = `🌟 Amazing job${state.name?`, ${state.name}`:''}! You completed the song! 🌟`;
+  } else { 
+    star.classList.remove('twinkle'); 
+    star.classList.remove('small'); 
+  }
 }
 
 // ----- Timer & session best/last -----
@@ -502,14 +563,29 @@ function handleIncomingMidi(midi){
 
 function onCorrect(stepWhite, octave){
   // Removed playSample call
-  state.idx++; feedback.textContent = `Great job${state.name?`, ${state.name}`:''}! 🎉`;
+  state.idx++; 
+  
+  // Fun feedback messages for children
+  const encouragements = [
+    "Awesome! 🎉", "Great job! ⭐", "Fantastic! 🌟", "Well done! 🎵", 
+    "Perfect! 🎹", "Amazing! 🚀", "Brilliant! ✨", "Excellent! 🏆"
+  ];
+  const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+  feedback.textContent = `${randomEncouragement}${state.name ? ` ${state.name}!` : ''}`;
+  
   if(state.idx>=state.queue.length){
     state.finished=true; renderPrompt(); renderTimeline(); placeStar(); stopTimerAndRecord(); return;
   }
   renderPrompt(); renderTimeline(); placeStar();
   // Removed guide playback
 }
-function onWrong(msg){ feedback.textContent = msg; }
+
+function onWrong(msg){ 
+  // Make error messages more child-friendly
+  const friendlyMsg = msg.replace('Sorry, wrong note', 'Oops! Try a different note')
+                        .replace('try again', 'give it another try');
+  feedback.textContent = friendlyMsg; 
+}
 
 // ----- File Loading (MIDI only) -----
 async function onFile(e){ 

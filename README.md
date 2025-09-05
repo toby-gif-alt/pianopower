@@ -1,33 +1,58 @@
+# PianoPal 🎹 - Child-Friendly Piano Learning
 
-# PianoPal (no-build)
+A fun, single-file kids piano trainer perfect for GitHub Pages deployment! Features a beautiful 3-page child-friendly interface with engaging animations.
 
-A single-file kids piano trainer you can deploy on GitHub Pages. Supports:
+## ✨ Features
 
-- Microphone pitch detection **or** USB/MIDI keyboards
-- **Easy** (one octave C4–B4) and **Strict** (multi‑octave C1–B7) difficulty
-- Color-coded keys (C=Red, D=Orange, E=Yellow, F=Green, G=Light Blue, A=Navy, B=Purple)
-- Big note timeline, star‑jump animation, friendly feedback
-- Built‑in songs: *Twinkle Twinkle Little Star*, *Mary Had a Little Lamb*
-- Load your own **MIDI** or **MusicXML** (MuseScore → *File → Export*)
-- Optional **audio samples** playback for correct notes (`/samples/C1.mp3`…`B7.mp3`, sharps like `F#3.mp3` supported)
-- **Auto‑play guide** note toggle (plays the target note sample before each prompt)
-- Session **Best/Last** time tracker (resets on page reload)
+- **🎤 Microphone pitch detection** or **🎹 USB/MIDI keyboards**
+- **👶 Child-friendly 3-page interface**:
+  1. **Welcome page**: Simple greeting and name input
+  2. **Song selection**: Big colorful song buttons with smaller options
+  3. **Game interface**: Interactive piano with star animation
+- **🎵 Two difficulty modes**: Easy (single octave) and Strict (multi-octave)
+- **🌈 Color-coded piano keys** (C=Red, D=Orange, E=Yellow, F=Green, G=Light Blue, A=Navy, B=Purple)
+- **⭐ Enhanced star animation** with platform jumping and twinkling effects
+- **🎼 Built-in songs**: *Twinkle Twinkle Little Star*, *Mary Had a Little Lamb*
+- **📁 MIDI file upload** support (upload your own songs!)
+- **⏱️ Session timing** with best/last time tracking
 
-## Quick start
+## 🚀 Quick Start
 
-1. Create a repo and add:
-   - `index.html` (this file)
-   - Optionally a `samples/` folder with your note files, named like `C4.mp3`, `F#3.ogg`, `Bb2.wav`.
-2. Enable GitHub Pages: **Settings → Pages → Branch: `main` → `/root`**.
-3. Open the Pages URL — done.
+1. **Create a repo** and add `index.html` (this single file contains everything!)
+2. **Enable GitHub Pages**: Settings → Pages → Branch: `main` → `/root`
+3. **Open your Pages URL** — that's it! 🎉
 
-## Usage tips
+## 🎯 How to Use
 
-- **Strict mode** expands the on-screen keyboard to the song’s octave range and enforces octave‑correct input, telling kids “try again lower/higher” when off by an octave.
-- **Mic vs MIDI**: Web MIDI works best in Chrome/Edge. Mic requires permission.
-- **No persistence**: Nothing is stored after reload; timing stats are per‑session only.
-- **MuseScore**: export as **MIDI** or **MusicXML**; `.mscz` is not read directly.
+1. **Enter your name** on the welcome page
+2. **Choose your input method** (microphone or MIDI keyboard) and difficulty
+3. **Select a song** with the big colorful buttons
+4. **Follow the prompts** and watch the star jump up platforms as you play!
 
-## Add more songs
+## 🎮 Game Features
 
-You can modify the `SONGS` object in `index.html` to add your sequences using step+octave (e.g., `E4`, `F#3`). Uploaded files can contain accidentals; the trainer currently focuses on white-key prompts, but samples will play whichever step/octave you provide for guide playback.
+- **Fun feedback messages** with encouraging emojis
+- **Platform-jumping star animation** that progresses through the song
+- **Color-coded note timeline** showing upcoming notes
+- **Child-friendly fonts and styling** with the Fredoka font family
+- **Responsive design** that works on tablets and desktops
+
+## 💡 Tips
+
+- **Strict mode** shows octave numbers and enforces precise octave matching
+- **Easy mode** focuses on note names without octave requirements  
+- **Microphone mode** works best in quiet environments
+- **MIDI mode** works best in Chrome/Edge browsers
+- **No data persistence** - everything resets on page reload for privacy
+
+## 🎼 Adding More Songs
+
+You can modify the `SONGS` object in `index.html` to add your own note sequences using step+octave notation (e.g., `E4`, `F#3`). Uploaded MIDI files work great too!
+
+## 🛠️ Technical Notes
+
+- **Single HTML file** - no build process required
+- **Web MIDI API** for keyboard support
+- **Web Audio API** for microphone pitch detection
+- **Pure CSS animations** for smooth star movement
+- **No external dependencies** except font loading

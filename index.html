@@ -1,0 +1,452 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PianoPal — Learn Piano</title>
+  <style>
+    :root { --ink:#1e1b4b; --panel:#ffffffcc; --shadow: 0 10px 30px rgba(0,0,0,.08); }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; background: linear-gradient(135deg,#e0f2fe,#e9d5ff); color:var(--ink); }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 24px; }
+    .card { background: var(--panel); border: 1px solid #e5e7eb; border-radius: 20px; padding: 16px; box-shadow: var(--shadow); }
+    .btn { background:#4f46e5; color:#fff; border:none; border-radius:14px; padding:12px 16px; font-weight:700; cursor:pointer; }
+    .btn:disabled { opacity:.6; cursor:not-allowed; }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; }
+    .pill.active { outline:3px solid #a5b4fc; }
+    .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .grid2 { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:12px; }
+    .kbd { user-select:none; display:flex; gap:6px; padding:10px; border-radius:18px; border:1px solid #e5e7eb; background:#ffffffcf; box-shadow: inset 0 6px 14px rgba(0,0,0,.05); overflow-x:auto; }
+    .white { position:relative; flex:1 1 0; height:120px; min-width:44px; border-radius:12px; background:#fff; border:1px solid #e5e7eb; box-shadow: inset 0 -2px 0 #e5e7eb; }
+    .white .lbl { position:absolute; bottom:6px; width:100%; text-align:center; font-size:12px; font-weight:700; }
+    .timeline { height:72px; border-radius:16px; background:#ffffffcf; border:1px solid #e5e7eb; padding:8px; display:flex; gap:8px; overflow:hidden; }
+    .noteBlock { min-width:12%; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; box-shadow: var(--shadow); }
+    .scene { position:relative; height:240px; border-radius:20px; overflow:hidden; background: linear-gradient(180deg,#0b102d,#1e3a8a); box-shadow: inset 0 -40px 80px rgba(0,0,0,.3); }
+    .bed { position:absolute; left:0; right:0; bottom:0; height:56px; background: #fde68a99; backdrop-filter: blur(2px); }
+    .plat { position:absolute; left:24px; right:24px; height:4px; background:#ffffff66; border-radius:999px; }
+    .star { position:absolute; left:50%; transform:translateX(-50%); width:70px; transition: transform .35s cubic-bezier(.2,.9,.2,1); }
+    @keyframes twinkle { 0%,100%{opacity:1} 50%{opacity:.6} }
+    .twinkle { animation: twinkle 1.2s ease-in-out infinite; }
+    .small { transform: translateX(-50%) scale(.4) translateY(0) !important; }
+    .feedback { text-align:center; font-weight:700; }
+    .muted { color:#4338ca; opacity:.85; }
+    .hidden { display:none; }
+    .select, select, input[type="text"]{ padding:10px; border-radius:12px; border:1px solid #e5e7eb }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="row" style="justify-content:space-between;margin-bottom:16px">
+      <h1 style="margin:0;font-size:28px">PianoPal</h1>
+      <div class="muted">One‑octave or multi‑octave (strict) kids piano</div>
+    </header>
+
+    <section id="welcome" class="card">
+      <h2 style="margin-top:0">Hello! Time to learn Piano 🎹</h2>
+      <div class="row">
+        <label>Name: <input id="name" placeholder="Your name" /></label>
+      </div>
+
+      <h3>Choose input</h3>
+      <div class="grid2">
+        <button class="pill active" id="modeMic">Microphone</button>
+        <button class="pill" id="modeMIDI">MIDI Keyboard</button>
+      </div>
+
+      <h3 style="margin-top:16px">Difficulty</h3>
+      <div class="grid2">
+        <button class="pill active" id="easyMode">Easy — single octave (C4–B4)</button>
+        <button class="pill" id="strictMode">Strict — match octaves (C1–B7)</button>
+      </div>
+
+      <h3 style="margin-top:16px">Song</h3>
+      <div class="row">
+        <select id="songSelect">
+          <option value="twinkle">Twinkle Twinkle Little Star</option>
+          <option value="mary">Mary Had a Little Lamb</option>
+          <option value="uploaded">Use uploaded file</option>
+        </select>
+        <input type="file" id="file" accept=".mid,.midi,.musicxml,.xml" />
+      </div>
+
+      <div class="row" style="margin-top:16px">
+        <label class="row"><input type="checkbox" id="toggleSamples"/> Play note audio on correct input</label>
+        <label class="row"><input type="checkbox" id="toggleGuide"/> Auto‑play guide note before each prompt</label>
+      </div>
+
+      <div class="row" style="margin-top:16px">
+        <button id="start" class="btn">Start!</button>
+        <span class="muted">(or use the built‑in songs)</span>
+      </div>
+
+      <details style="margin-top:16px"><summary><b>Audio samples</b> (optional)</summary>
+        <div class="card" style="margin-top:8px">
+          Place your samples in <code>/samples/</code> and name them like <code>C4.mp3</code>, <code>F#3.ogg</code>, <code>Bb2.wav</code>. Accidentals are supported for future harder songs.
+        </div>
+      </details>
+    </section>
+
+    <section id="play" class="hidden">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">
+        <div><b id="songTitle">Twinkle Twinkle Little Star</b></div>
+        <button class="pill" id="back">Back</button>
+      </div>
+
+      <div class="scene" id="scene">
+        <div class="bed"></div>
+        <div class="plat" style="bottom:28px"></div>
+        <div class="plat" style="bottom:68px"></div>
+        <div class="plat" style="bottom:108px"></div>
+        <div class="plat" style="bottom:148px"></div>
+        <div class="plat" style="bottom:188px"></div>
+        <svg class="star" id="star" viewBox="0 0 100 100">
+          <polygon points="50,5 61,38 95,38 67,58 78,90 50,70 22,90 33,58 5,38 39,38" fill="#ffd26a" stroke="#f59e0b" stroke-width="3"/>
+          <circle cx="40" cy="42" r="5" fill="#00000033"/>
+          <circle cx="60" cy="42" r="5" fill="#00000033"/>
+          <path d="M35 60 Q50 70 65 60" stroke="#00000044" stroke-width="4" fill="none"/>
+        </svg>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="row" style="justify-content:space-between">
+          <div>Input: <b id="modeLbl">Microphone</b></div>
+          <div>Time: <b id="time">0s</b> | Best: <b id="best">—</b> | Last: <b id="last">—</b></div>
+        </div>
+        <div style="margin:8px 0;font-weight:800" id="prompt">Press: C (Red)</div>
+        <div class="kbd" id="kbd"></div>
+        <div class="feedback muted" id="feedback"></div>
+      </div>
+    </section>
+
+    <footer style="margin-top:16px" class="muted">No data is stored after reload. Session-only best/last times are cleared when you close or refresh the page.</footer>
+  </div>
+
+<script>
+// --------- Config ---------
+const COLORS = { C:'#ef4444', D:'#f97316', E:'#facc15', F:'#22c55e', G:'#7dd3fc', A:'#1d4ed8', B:'#a855f7' };
+const COLOR_NAME = { C:'Red', D:'Orange', E:'Yellow', F:'Green', G:'Light Blue', A:'Navy Blue', B:'Purple' };
+const WHITE = ['C','D','E','F','G','A','B'];
+const STEPS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const C4 = 60; // middle C
+
+// Built-in songs (as step+octave sequences)
+const SONGS = {
+  twinkle: {
+    title: 'Twinkle Twinkle Little Star',
+    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+  },
+  mary: {
+    title: 'Mary Had a Little Lamb',
+    notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4']
+  }
+};
+
+// State (session only)
+let state = {
+  mode: 'mic',            // 'mic' | 'midi'
+  difficulty: 'easy',     // 'easy' | 'strict'
+  name: '',
+  queue: SONGS.twinkle.notes.map(toObj), // default
+  idx: 0,
+  finished: false,
+  startTime: null,
+  elapsed: 0,
+  bestTimes: {},          // per-song best in this session
+  lastTimes: {},          // per-song last in this session
+  songKey: 'twinkle',
+  expected() { return this.queue[this.idx] || null; },
+};
+
+// Helpers
+const el = (id)=>document.getElementById(id);
+function toObj(s){ // 'C#4' -> {step:'C#'|'Db', stepWhite:'C', octave:4}
+  const m = s.match(/^([A-G]#?)(\d)$/); if(!m) return {step:'C', stepWhite:'C', octave:4};
+  const step = m[1]; const octave = parseInt(m[2],10);
+  const stepWhite = step.replace('#',''); // map to white for visuals
+  return {step, stepWhite, octave};
+}
+function fromMidi(m){
+  const step = STEPS[m%12]; const octave=Math.floor(m/12)-1;
+  return {step, stepWhite: step.replace('#',''), octave};
+}
+function toLabel(n, strict){ return strict ? `${n.stepWhite}${n.octave}` : n.stepWhite; }
+function sayWrong(){ return 'Sorry, wrong note'; }
+function dir(target, got){ return got<target ? 'Try again but higher' : 'Try again lower'; }
+
+// UI refs
+const welcome = el('welcome');
+const play = el('play');
+const kbd = el('kbd');
+const prompt = el('prompt');
+const feedback = el('feedback');
+const modeLbl = el('modeLbl');
+const timeline = el('timeline');
+const star = el('star');
+const timeLbl = el('time');
+const bestLbl = el('best');
+const lastLbl = el('last');
+const songTitleLbl = el('songTitle');
+
+// Controls wiring
+el('modeMic').onclick = (e)=>{ pick('mode','mic',['modeMic','modeMIDI'],e)};
+el('modeMIDI').onclick = (e)=>{ pick('mode','midi',['modeMic','modeMIDI'],e)};
+el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','strictMode'],e)};
+el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','strictMode'],e)};
+el('start').onclick = startGame;
+el('back').onclick = ()=>{ stopInputs(); reset(); swap(play,welcome); };
+el('file').addEventListener('change', onFile);
+el('songSelect').addEventListener('change', onSongChange);
+
+function onSongChange(e){
+  state.songKey = e.target.value;
+  if(state.songKey!=='uploaded'){
+    const s = SONGS[state.songKey];
+    songTitleLbl.textContent = s.title;
+    state.queue = s.notes.map(toObj);
+  } else {
+    songTitleLbl.textContent = 'Uploaded Song';
+  }
+  renderPrompt(); renderTimeline(); renderKeyboard();
+}
+
+function pick(key,val,ids,e){
+  state[key]=val; ids.forEach(id=>el(id).classList.remove('active')); e.target.classList.add('active');
+}
+
+function swap(hide,show){ hide.classList.add('hidden'); show.classList.remove('hidden'); }
+
+function reset(){
+  state.idx=0; state.finished=false; state.startTime=null; state.elapsed=0;
+  feedback.textContent = '';
+  renderTimeline();
+  renderKeyboard();
+  renderPrompt();
+  placeStar();
+  updateTimes();
+}
+
+function startGame(){
+  state.name = el('name').value.trim();
+  modeLbl.textContent = state.mode==='mic'?'Microphone':'MIDI';
+  reset();
+  swap(welcome, play);
+  startTimer();
+  if(state.mode==='mic') startMic(); else startMIDI();
+  if(document.getElementById('toggleGuide').checked){
+    const exp = state.expected(); if(exp) playSample(exp.step, exp.octave, true);
+  }
+}
+
+// ----- Timeline & Prompt -----
+function renderTimeline(){
+  timeline.innerHTML='';
+  const next = state.queue.slice(state.idx, state.idx+8);
+  for(const n of next){
+    const div = document.createElement('div');
+    div.className='noteBlock';
+    const color = COLORS[n.stepWhite]||'#94a3b8';
+    div.style.background = color;
+    div.textContent = (COLOR_NAME[n.stepWhite]||n.stepWhite);
+    timeline.appendChild(div);
+  }
+}
+function renderPrompt(){
+  const exp = state.expected();
+  if(!exp){ prompt.textContent = state.finished ? `All done${state.name?`, ${state.name}`:''}!` : ''; return; }
+  const color = COLOR_NAME[exp.stepWhite];
+  prompt.textContent = `Press: ${toLabel(exp, state.difficulty==='strict')} (${color})`;
+  renderKeyboard(exp);
+}
+
+// ----- Keyboard -----
+function buildKey(step, octave, active){
+  const d = document.createElement('div');
+  d.className = 'white';
+  if(active && active.stepWhite===step && (state.difficulty==='easy' || active.octave===octave)){
+    d.style.background = COLORS[step];
+  }
+  const l = document.createElement('div'); l.className='lbl'; l.textContent = step+(state.difficulty==='strict'?octave:'');
+  d.appendChild(l);
+  return d;
+}
+function songRange(){
+  let low = Math.min(...state.queue.map(n=>n.octave));
+  let high = Math.max(...state.queue.map(n=>n.octave));
+  low = Math.max(1, isFinite(low)?low:4); high = Math.min(7, isFinite(high)?high:4);
+  return [low, high];
+}
+function renderKeyboard(active){
+  kbd.innerHTML='';
+  if(state.difficulty==='easy'){
+    for(const w of WHITE){ kbd.appendChild(buildKey(w,4,active)); }
+  } else {
+    const [low,high]=songRange();
+    for(let o = low; o<=high; o++){ for(const w of WHITE){ kbd.appendChild(buildKey(w,o,active)); } }
+  }
+}
+
+// ----- Star animation -----
+function placeStar(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  const baseY = 180; // px up from bottom
+  const y = baseY - progress*150;
+  const scale = 1 - progress*0.6;
+  star.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`;
+  if(state.finished){ star.classList.add('twinkle'); star.classList.add('small'); }
+  else { star.classList.remove('twinkle'); star.classList.remove('small'); }
+}
+
+// ----- Timer & session best/last -----
+let rafId=null; function startTimer(){
+  cancelAnimationFrame(rafId);
+  const start = performance.now(); state.startTime=start;
+  const tick = (t)=>{ state.elapsed = Math.round((t-start)/1000); timeLbl.textContent = state.elapsed+'s'; rafId=requestAnimationFrame(tick); };
+  rafId=requestAnimationFrame(tick);
+}
+function stopTimerAndRecord(){
+  cancelAnimationFrame(rafId);
+  const secs = state.elapsed;
+  const key = state.songKey;
+  state.lastTimes[key] = secs;
+  if(!state.bestTimes[key] || secs < state.bestTimes[key]) state.bestTimes[key] = secs;
+  updateTimes();
+}
+function updateTimes(){
+  const key=state.songKey;
+  bestLbl.textContent = state.bestTimes[key] ? `${state.bestTimes[key]}s` : '—';
+  lastLbl.textContent = state.lastTimes[key] ? `${state.lastTimes[key]}s` : '—';
+}
+
+// ----- Input Handling (MIDI + Mic) -----
+let midiAccess=null; let midiHandler=null; let stopMicFn=null;
+async function startMIDI(){
+  stopInputs();
+  try{
+    midiAccess = await navigator.requestMIDIAccess();
+    for(const input of midiAccess.inputs.values()){
+      input.addEventListener('midimessage', midiHandler = (e)=>{
+        const [status, note, vel] = e.data; const on = (status & 0xf0)===0x90 && vel>0; if(!on) return;
+        handleIncomingMidi(note);
+      });
+    }
+  }catch(e){ alert('Web MIDI not supported in this browser. Try Chrome/Edge or use Mic mode.'); }
+}
+function stopMIDI(){ if(!midiAccess) return; for(const input of midiAccess.inputs.values()){ if(midiHandler) input.removeEventListener('midimessage', midiHandler);} midiAccess=null; }
+
+async function startMic(){
+  stopInputs();
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream);
+    const analyser = ctx.createAnalyser(); analyser.fftSize=2048; src.connect(analyser);
+    const buf = new Float32Array(analyser.fftSize);
+    let running=true;
+    const loop=()=>{ if(!running) return; analyser.getFloatTimeDomainData(buf); const f=autoCorrelate(buf, ctx.sampleRate); if(f>0){ const midi=Math.round(69+12*Math.log2(f/440)); handleIncomingMidi(midi,true); } requestAnimationFrame(loop); };
+    loop();
+    stopMicFn=()=>{ running=false; stream.getTracks().forEach(t=>t.stop()); ctx.close(); };
+  }catch(e){ alert('Microphone access failed. Check permissions.'); }
+}
+function stopMic(){ if(stopMicFn){ stopMicFn(); stopMicFn=null; } }
+function stopInputs(){ stopMIDI(); stopMic(); }
+
+function autoCorrelate(buf, sr){
+  let sum=0; for(let i=0;i<buf.length;i++) sum+=buf[i]*buf[i];
+  const rms=Math.sqrt(sum/buf.length); if(rms<0.01) return -1;
+  const SIZE=buf.length; const MAX=Math.floor(SIZE/2); let best=-1, bestCorr=0, last=1;
+  for(let off=2; off<MAX; off++){
+    let corr=0; for(let i=0;i<MAX;i++) corr += Math.abs(buf[i]-buf[i+off]);
+    corr = 1 - corr / MAX; if(corr>0.9 && corr>last){ bestCorr=corr; best=off; } last=corr;
+  }
+  if(bestCorr>0.01) return sr/best; return -1;
+}
+
+// ----- Sample Playback -----
+const useSamples = ()=> document.getElementById('toggleSamples').checked;
+async function playSample(step, octave, guide=false){
+  if(!useSamples() && !guide) return;
+  const name = `${step}${octave}`.replace('##','#'); // e.g., C#4
+  const candidates = [`samples/${name}.mp3`, `samples/${name}.ogg`, `samples/${name}.wav`];
+  for(const u of candidates){
+    try{ const r = await fetch(u, {method:'HEAD'}); if(r.ok){ const audio = new Audio(u); audio.play(); return; } }catch(e){}
+  }
+}
+
+// ----- Correctness Logic -----
+function handleIncomingMidi(midi){
+  const exp = state.expected(); if(!exp) return;
+  const got = fromMidi(midi);
+  if(state.difficulty==='easy'){
+    if(got.stepWhite===exp.stepWhite){ onCorrect(exp.stepWhite, 4); }
+    else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
+  } else {
+    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp.stepWhite, got.octave); }
+    else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
+    else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
+  }
+}
+
+function onCorrect(stepWhite, octave){
+  playSample(stepWhite, octave);
+  state.idx++; feedback.textContent = `Great job${state.name?`, ${state.name}`:''}!`;
+  if(state.idx>=state.queue.length){
+    state.finished=true; renderPrompt(); renderTimeline(); placeStar(); stopTimerAndRecord(); return;
+  }
+  renderPrompt(); renderTimeline(); placeStar();
+  if(document.getElementById('toggleGuide').checked){
+    const exp = state.expected(); if(exp) setTimeout(()=>playSample(exp.step, exp.octave, true), 180);
+  }
+}
+function onWrong(msg){ feedback.textContent = msg; }
+
+// ----- File Loading (MIDI / MusicXML) -----
+async function onFile(e){ const f=e.target.files[0]; if(!f) return; const name=f.name.toLowerCase(); try{
+  let seq=null; if(name.endsWith('.mid')||name.endsWith('.midi')) seq=await parseMIDI(f); else if(name.endsWith('.musicxml')||name.endsWith('.xml')) seq=await parseMusicXML(f); else { alert('Unsupported file. Use .mid/.midi or .musicxml'); return; }
+  if(!seq || !seq.length){ alert('No notes found.'); return; }
+  state.songKey='uploaded';
+  songTitleLbl.textContent = f.name.replace(/\.(mid|midi|musicxml|xml)$/i,'');
+  state.queue = postProcessSequence(seq);
+  renderPrompt(); renderTimeline(); placeStar(); renderKeyboard();
+} catch(err){ console.error(err); alert('Could not read that file. Export MIDI or MusicXML from MuseScore.'); } }
+
+function postProcessSequence(seq){
+  if(state.difficulty==='easy'){ return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave:4})); }
+  // strict: keep octave (clamp 1..7)
+  return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4)))}));
+}
+
+async function parseMIDI(file){
+  const buf = await file.arrayBuffer();
+  // Use ToneJS MIDI via esm.sh
+  const mod = await import('https://esm.sh/@tonejs/midi@2.0.28');
+  const midi = new mod.Midi(buf);
+  const notes=[]; const track=midi.tracks[0];
+  track.notes.forEach(n=>{ const obj=fromMidi(n.midi); if(WHITE.includes(obj.stepWhite)) notes.push(obj); });
+  return notes;
+}
+
+async function parseMusicXML(file){
+  const txt = await file.text(); const doc = new DOMParser().parseFromString(txt, 'application/xml');
+  const out=[]; const ns = doc.getElementsByTagName('note');
+  for(const n of ns){
+    if(n.getElementsByTagName('rest')[0]) continue;
+    const pitch = n.getElementsByTagName('pitch')[0]; if(!pitch) continue;
+    const step = pitch.getElementsByTagName('step')[0]?.textContent?.trim();
+    const alter = parseInt(pitch.getElementsByTagName('alter')[0]?.textContent||'0',10);
+    const octave = parseInt(pitch.getElementsByTagName('octave')[0]?.textContent||'4',10);
+    if(!step) continue;
+    let label = step; if(alter===1) label = step+'#'; if(alter===-1) { /* flats -> map to white by dropping accidental */ }
+    const white = label.replace('#','');
+    out.push({step:label, stepWhite:white, octave});
+  }
+  return out;
+}
+
+// Initial render
+renderTimeline(); renderKeyboard(); renderPrompt(); placeStar();
+</script>
+</body>
+</html>

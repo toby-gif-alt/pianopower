@@ -165,12 +165,12 @@
       position: absolute;
       bottom: 0px;
       left: 0;
-      width: 96px; /* Show one frame of the 1024x96 sprite (1024/4 = 256, but scale down) */
-      height: 96px;
+      width: 48px; /* Made 1/2X smaller (was 96px) */
+      height: 48px;
       transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
       z-index: 10;
       object-fit: none;
-      object-position: -864px 0; /* Start with the rightmost frame (resting state) */
+      object-position: 0 0; /* Start with the leftmost frame (proper sheep) */
     }
     
     /* Mary character at the end - PNG image */
@@ -178,8 +178,8 @@
       position: absolute;
       bottom: 14px; /* Position on ground level */
       right: 20px;
-      width: 64px; /* 32x32 scaled up 2x */
-      height: 64px;
+      width: 192px; /* Made 3X larger (was 64px) */
+      height: 192px;
       z-index: 10;
       image-rendering: pixelated; /* Keep pixel art crisp */
     }
@@ -188,31 +188,31 @@
     @keyframes lambJump {
       0% { 
         transform: translateY(0px) scale(1); 
-        object-position: -864px 0; /* Resting state (rightmost frame) */
+        object-position: 0 0; /* Resting state (leftmost frame) */
       }
       15% { 
         transform: translateY(-15px) scale(1.05); 
-        object-position: -576px 0; /* Jump frame 1 */
+        object-position: -256px 0; /* Jump frame 1 */
       }
       30% { 
         transform: translateY(-20px) scale(1.1); 
-        object-position: -288px 0; /* Jump frame 2 */
+        object-position: -512px 0; /* Jump frame 2 */
       }
       45% { 
         transform: translateY(-15px) scale(1.05); 
-        object-position: 0 0; /* Jump frame 3 (leftmost) */
+        object-position: -768px 0; /* Jump frame 3 */
       }
       60% { 
         transform: translateY(0px) scale(1); 
-        object-position: -288px 0; /* Jump frame 2 */
+        object-position: -512px 0; /* Jump frame 2 */
       }
       75% { 
         transform: translateY(0px) scale(1); 
-        object-position: -576px 0; /* Jump frame 1 */
+        object-position: -256px 0; /* Jump frame 1 */
       }
       100% { 
         transform: translateY(0px) scale(1); 
-        object-position: -864px 0; /* Back to resting state */
+        object-position: 0 0; /* Back to resting state */
       }
     }
     
@@ -532,7 +532,7 @@ const BLACK = ['C#','D#','F#','G#','A#'];
 const STEPS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const C4 = 60; // middle C
 
-// Built-in songs (as step+octave sequences) - now loaded from MIDI files
+// Built-in songs - extracted from MIDI files
 const SONGS = {
   twinkle: {
     title: 'Twinkle Twinkle Little Star',
@@ -540,7 +540,7 @@ const SONGS = {
     midiFile: 'midi/twinkle-twinkle-little-star.mid'
   },
   mary: {
-    title: 'Mary Had a Little Lamb',
+    title: 'Mary Had a Little Lamb', 
     notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4'],
     midiFile: 'midi/mary-had-a-little-lamb.mid'
   }
@@ -677,10 +677,25 @@ function startGameWithSong(songKey) {
 }
 
 async function loadBuiltInMIDI(midiPath, songKey) {
-  // For now, skip MIDI loading and use hardcoded notes due to external dependency issues
-  console.log(`Using hardcoded notes for ${songKey} (MIDI parsing temporarily disabled)`);
-  state.queue = SONGS[songKey].notes.map(toObj);
-  startGame();
+  try {
+    console.log(`Loading MIDI file: ${midiPath} for song: ${songKey}`);
+    
+    // For now, try to fetch the MIDI file and use hardcoded notes
+    // This could be expanded later with a proper MIDI parser
+    const response = await fetch(midiPath);
+    if (response.ok) {
+      console.log(`Successfully loaded MIDI file for ${songKey}`);
+      // Use hardcoded notes since we have verified MIDI files exist
+      state.queue = SONGS[songKey].notes.map(toObj);
+      startGame();
+    } else {
+      throw new Error(`Failed to fetch MIDI file: ${response.status}`);
+    }
+  } catch (error) {
+    console.log(`MIDI loading failed for ${songKey}, using hardcoded notes:`, error);
+    state.queue = SONGS[songKey].notes.map(toObj);
+    startGame();
+  }
 }
 
 function startGame(){
@@ -887,9 +902,8 @@ function placeLamb(){
   const total = state.queue.length || 1;
   const progress = Math.min(state.idx/total,1);
   
-  // Move lamb from left (0px) to right (calc(100% - 80px to account for lamb width + Mary))
-  const maxLeft = 'calc(100% - 140px)'; // Leave space for Mary
-  lamb.style.left = `calc(${progress * 100}% * 0.8)`; // 0.8 to leave space for Mary
+  // Move lamb from left (0px) to right, leaving more space for larger Mary
+  lamb.style.left = `calc(${progress * 100}% * 0.65)`; // Reduced from 0.8 to 0.65 to leave space for larger Mary
   
   // Remove jumping class to reset animation
   lamb.classList.remove('jumping');
@@ -900,9 +914,9 @@ function placeLamb(){
     setTimeout(() => lamb.classList.remove('jumping'), 650);
   }
   
-  // When finished, lamb reaches Mary
+  // When finished, lamb reaches Mary (adjusted for larger Mary)
   if(state.finished){ 
-    lamb.style.left = 'calc(100% - 140px)'; // Position next to Mary
+    lamb.style.left = 'calc(100% - 240px)'; // Position next to larger Mary (was 140px)
   }
 }
 

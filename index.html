@@ -680,13 +680,21 @@ async function loadBuiltInMIDI(midiPath, songKey) {
   try {
     console.log(`Loading MIDI file: ${midiPath} for song: ${songKey}`);
     
-    // For now, try to fetch the MIDI file and use hardcoded notes
-    // This could be expanded later with a proper MIDI parser
     const response = await fetch(midiPath);
     if (response.ok) {
       console.log(`Successfully loaded MIDI file for ${songKey}`);
-      // Use hardcoded notes since we have verified MIDI files exist
-      state.queue = SONGS[songKey].notes.map(toObj);
+      
+      // Parse the MIDI file using existing parser
+      const buffer = await response.arrayBuffer();
+      const seq = await parseMIDIBuffer(buffer);
+      
+      if (!seq || !seq.length) {
+        throw new Error('No notes found in MIDI file');
+      }
+      
+      // Process the sequence and start the game
+      state.queue = postProcessSequence(seq);
+      console.log(`Parsed ${seq.length} notes from MIDI file for ${songKey}`);
       startGame();
     } else {
       throw new Error(`Failed to fetch MIDI file: ${response.status}`);

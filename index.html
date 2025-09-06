@@ -123,6 +123,9 @@
     .scene { position:relative; height:240px; border-radius:20px; overflow:hidden; background: linear-gradient(180deg,#0b102d,#1e3a8a); box-shadow: inset 0 -40px 80px rgba(0,0,0,.3); }
     .bed { position:absolute; left:0; right:0; bottom:0; height:56px; background: #fde68a99; backdrop-filter: blur(2px); }
     .plat { position:absolute; left:24px; right:24px; height:4px; background:#ffffff66; border-radius:999px; }
+    /* Hide platforms behind characters */
+    .star, .lamb, .mary { z-index: 10; }
+    .plat { z-index: 1; }
     .star { 
       position:absolute; 
       left:50%; 
@@ -192,7 +195,7 @@
       animation: finalCelebration 2s ease-in-out infinite;
     }
     
-    /* Completion popup modal */
+    /* Completion popup modal - Enhanced */
     .completion-modal {
       position: fixed;
       top: 0;
@@ -211,7 +214,7 @@
       border-radius: 24px;
       padding: 40px;
       text-align: center;
-      max-width: 400px;
+      max-width: 500px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       animation: popupAppear 0.5s cubic-bezier(.68,-0.55,.265,1.55);
     }
@@ -224,14 +227,101 @@
     .completion-popup h2 {
       color: var(--big-button);
       margin-bottom: 20px;
-      font-size: 32px;
+      font-size: 36px;
+      font-family: var(--fun-font);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
     
     .completion-popup .time-display {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--ink);
+      font-size: 48px;
+      font-weight: 800;
+      color: #7c3aed;
       margin: 20px 0;
+      font-family: var(--fun-font);
+      text-shadow: 2px 2px 4px rgba(124, 58, 237, 0.3);
+    }
+    
+    .completion-popup .comparison-graph {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f8fafc;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+    }
+    
+    .graph-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+    
+    .graph-bar {
+      display: flex;
+      align-items: center;
+      margin: 12px 0;
+      position: relative;
+    }
+    
+    .graph-label {
+      width: 100px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .graph-bar-container {
+      flex: 1;
+      height: 24px;
+      background: #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 12px;
+      position: relative;
+    }
+    
+    .graph-bar-fill {
+      height: 100%;
+      border-radius: 12px;
+      transition: width 0.8s ease-out;
+      position: relative;
+    }
+    
+    .target-bar { background: #10b981; }
+    .user-bar { background: #3b82f6; }
+    .user-bar.better { background: #f59e0b; }
+    .user-bar.excellent { background: #8b5cf6; }
+    
+    .graph-time {
+      font-weight: 700;
+      font-size: 12px;
+      min-width: 40px;
+      text-align: right;
+    }
+    
+    .celebration {
+      margin: 20px 0;
+      font-size: 24px;
+      animation: bounce 1s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    
+    @keyframes confetti {
+      0% { transform: rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: rotate(720deg) scale(0); opacity: 0; }
+    }
+    
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #ff6b6b;
+      animation: confetti 2s ease-out forwards;
     }
     
     .completion-popup .button-row {
@@ -257,7 +347,7 @@
       <div class="center">
         <input id="name" class="name-input" placeholder="Your name" maxlength="20" />
         <br>
-        <button id="nextToSongs" class="big-btn" style="margin-top: 24px;">Let's Go! 🚀</button>
+        <button id="nextToSongs" class="big-btn" style="margin: 24px auto 0; display: block;">Let's Go! 🚀</button>
       </div>
     </section>
 
@@ -272,6 +362,11 @@
             <span style="font-weight: 600; margin-right: 12px;">Input:</span>
             <button class="pill active" id="modeMic">🎤 Microphone</button>
             <button class="pill" id="modeMIDI">🎹 MIDI Keyboard</button>
+          </div>
+          <div>
+            <span style="font-weight: 600; margin-right: 12px;">Audio:</span>
+            <button class="pill" id="audioOn">🔊 On</button>
+            <button class="pill active" id="audioOff">🔇 Off</button>
           </div>
           <div>
             <span style="font-weight: 600; margin-right: 12px;">Difficulty:</span>
@@ -320,8 +415,21 @@
         <div class="plat" style="bottom:148px"></div>
         <div class="plat" style="bottom:188px"></div>
         
-        <!-- Star for other songs -->
+        <!-- Star for other songs with house -->
         <svg class="star" id="star" viewBox="0 0 100 100">
+          <!-- House (visible at start) -->
+          <g id="starHouse">
+            <!-- House base -->
+            <rect x="20" y="70" width="60" height="25" fill="#8b4513" stroke="#654321" stroke-width="1"/>
+            <!-- House roof -->
+            <polygon points="15,70 50,50 85,70" fill="#dc2626" stroke="#b91c1c" stroke-width="1"/>
+            <!-- Door -->
+            <rect x="45" y="80" width="10" height="15" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
+            <!-- Window -->
+            <rect x="30" y="75" width="8" height="8" fill="#60a5fa" stroke="#3b82f6" stroke-width="0.5"/>
+            <rect x="62" y="75" width="8" height="8" fill="#60a5fa" stroke="#3b82f6" stroke-width="0.5"/>
+          </g>
+          <!-- Star character -->
           <polygon points="50,5 61,38 95,38 67,58 78,90 50,70 22,90 33,58 5,38 39,38" fill="#ffd26a" stroke="#f59e0b" stroke-width="3"/>
           <circle cx="40" cy="42" r="5" fill="#00000033"/>
           <circle cx="60" cy="42" r="5" fill="#00000033"/>
@@ -394,7 +502,25 @@
   <div id="completionModal" class="completion-modal hidden">
     <div class="completion-popup">
       <h2>🎉 Well Done!</h2>
-      <p style="font-size: 18px; margin: 16px 0;">You did it in <span id="completionTime">0</span> seconds!</p>
+      <p class="time-display" id="completionTimeDisplay">0s</p>
+      <div class="comparison-graph" id="comparisonGraph">
+        <div class="graph-title">Performance Comparison</div>
+        <div class="graph-bar">
+          <div class="graph-label">Target:</div>
+          <div class="graph-bar-container">
+            <div class="graph-bar-fill target-bar" id="targetBar"></div>
+          </div>
+          <div class="graph-time" id="targetTime">8s</div>
+        </div>
+        <div class="graph-bar">
+          <div class="graph-label">Your time:</div>
+          <div class="graph-bar-container">
+            <div class="graph-bar-fill user-bar" id="userBar"></div>
+          </div>
+          <div class="graph-time" id="userTime">0s</div>
+        </div>
+      </div>
+      <div id="celebrationMessage" class="celebration"></div>
       <p style="font-size: 16px; color: #6b7280;">Try again?</p>
       <div class="button-row">
         <button id="tryAgainBtn" class="big-btn" style="font-size: 18px; padding: 16px 24px; min-height: auto;">🔄 Try Again</button>
@@ -428,12 +554,14 @@ const SONGS = {
 let state = {
   mode: 'mic',            // 'mic' | 'midi'
   difficulty: 'easy',     // 'easy' | 'strict'
+  audioEnabled: false,    // Audio on/off toggle
   name: '',
   queue: SONGS.twinkle.notes.map(toObj), // default
   idx: 0,
   finished: false,
   startTime: null,
   elapsed: 0,
+  timerStarted: false,
   bestTimes: {},          // per-song best in this session
   lastTimes: {},          // per-song last in this session
   songKey: 'twinkle',
@@ -473,7 +601,7 @@ const bestLbl = el('best');
 const lastLbl = el('last');
 const songTitleLbl = el('songTitle');
 const completionModal = el('completionModal');
-const completionTime = el('completionTime');
+const completionTimeDisplay = el('completionTimeDisplay');
 const tryAgainBtn = el('tryAgainBtn');
 const backToMenuBtn = el('backToMenuBtn');
 
@@ -482,6 +610,8 @@ el('modeMic').onclick = (e)=>{ pick('mode','mic',['modeMic','modeMIDI'],e)};
 el('modeMIDI').onclick = (e)=>{ pick('mode','midi',['modeMic','modeMIDI'],e)};
 el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','strictMode'],e)};
 el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','strictMode'],e)};
+el('audioOn').onclick = (e)=>{ pick('audioEnabled',true,['audioOn','audioOff'],e)};
+el('audioOff').onclick = (e)=>{ pick('audioEnabled',false,['audioOn','audioOff'],e)};
 
 // New page navigation
 el('nextToSongs').onclick = ()=>{ 
@@ -506,7 +636,7 @@ el('file').addEventListener('change', onFile);
 tryAgainBtn.onclick = ()=>{ 
   completionModal.classList.add('hidden'); 
   reset(); 
-  startTimer();
+  // Timer will start when first note is pressed
   if(state.mode==='mic') startMic(); else startMIDI();
 };
 backToMenuBtn.onclick = ()=>{ 
@@ -527,7 +657,7 @@ function pick(key,val,ids,e){
 function swap(hide,show){ hide.classList.add('hidden'); show.classList.remove('hidden'); }
 
 function reset(){
-  state.idx=0; state.finished=false; state.startTime=null; state.elapsed=0;
+  state.idx=0; state.finished=false; state.startTime=null; state.elapsed=0; state.timerStarted=false;
   feedback.textContent = '';
   renderTimeline();
   renderKeyboard();
@@ -549,7 +679,7 @@ function startGame(){
   modeLbl.textContent = state.mode==='mic'?'Microphone':'MIDI';
   reset();
   swap(songSelection, play);
-  startTimer();
+  // Timer will start when first note is pressed
   if(state.mode==='mic') startMic(); else startMIDI();
   // Removed guide auto-play functionality
 }
@@ -638,7 +768,18 @@ function renderKeyboard(active){
   if(state.difficulty==='easy'){
     kbd.appendChild(buildOctaveKeys(4, active));
   } else {
-    const [low,high]=songRange();
+    // In strict mode, use MIDI device range if available, otherwise use song range
+    let [low, high] = songRange();
+    
+    if (state.mode === 'midi') {
+      const [midiLow, midiHigh] = getMIDIDeviceOctaveRange();
+      // Use MIDI device range if it's been detected and is reasonable
+      if (midiHigh > midiLow && midiHigh - midiLow <= 7) {
+        low = midiLow;
+        high = midiHigh;
+      }
+    }
+    
     for(let o = low; o<=high; o++){ 
       kbd.appendChild(buildOctaveKeys(o, active));
     }
@@ -668,6 +809,12 @@ function placeStarDefault(){
   const total = state.queue.length || 1;
   const progress = Math.min(state.idx/total,1);
   
+  // Show/hide house based on progress
+  const house = document.getElementById('starHouse');
+  if (house) {
+    house.style.display = progress < 0.1 ? 'block' : 'none';
+  }
+  
   // Platform positions from bottom: ground, 28px, 68px, 108px, 148px, 188px (top of sky)
   const platforms = [180, 152, 112, 72, 32, -8]; // Y positions for star (accounting for star height)
   const currentPlatform = Math.floor(progress * (platforms.length - 1));
@@ -677,6 +824,7 @@ function placeStarDefault(){
   const platformProgress = (progress * (platforms.length - 1)) - currentPlatform;
   const y = platforms[currentPlatform] + (platforms[nextPlatform] - platforms[currentPlatform]) * platformProgress;
   
+  // Scale gets smaller as star goes higher into the night sky
   const scale = 1 - progress * 0.6;
   
   // Remove jumping class to reset animation
@@ -694,6 +842,8 @@ function placeStarDefault(){
   if(state.finished){ 
     star.classList.add('twinkle'); 
     star.classList.add('small'); 
+    // Hide house when finished
+    if (house) house.style.display = 'none';
   } else { 
     star.classList.remove('twinkle'); 
     star.classList.remove('small'); 
@@ -745,7 +895,8 @@ function updateTimes(){
 }
 
 // ----- Input Handling (MIDI + Mic) -----
-let midiAccess=null; let midiHandler=null; let stopMicFn=null;
+let midiAccess=null; let midiHandler=null; let stopMicFn=null; let midiDeviceRange = { min: 21, max: 108 }; // Default 88-key piano range (A0 to C8)
+
 async function startMIDI(){
   stopInputs();
   try{
@@ -753,10 +904,32 @@ async function startMIDI(){
     for(const input of midiAccess.inputs.values()){
       input.addEventListener('midimessage', midiHandler = (e)=>{
         const [status, note, vel] = e.data; const on = (status & 0xf0)===0x90 && vel>0; if(!on) return;
+        detectMIDIDeviceRange(note);
         handleIncomingMidi(note);
       });
     }
   }catch(e){ alert('Web MIDI not supported in this browser. Try Chrome/Edge or use Mic mode.'); }
+}
+
+function detectMIDIDeviceRange(note) {
+  // Expand the detected range based on incoming notes
+  if (note < midiDeviceRange.min) {
+    midiDeviceRange.min = note;
+  }
+  if (note > midiDeviceRange.max) {
+    midiDeviceRange.max = note;
+  }
+  
+  // Re-render keyboard if in strict mode to adapt to detected device size
+  if (state.difficulty === 'strict') {
+    renderKeyboard(state.expected());
+  }
+}
+
+function getMIDIDeviceOctaveRange() {
+  const minOctave = Math.max(1, Math.floor((midiDeviceRange.min - 12) / 12));
+  const maxOctave = Math.min(7, Math.floor((midiDeviceRange.max - 12) / 12));
+  return [minOctave, maxOctave];
 }
 function stopMIDI(){ if(!midiAccess) return; for(const input of midiAccess.inputs.values()){ if(midiHandler) input.removeEventListener('midimessage', midiHandler);} midiAccess=null; }
 
@@ -788,8 +961,47 @@ function autoCorrelate(buf, sr){
   if(bestCorr>0.01) return sr/best; return -1;
 }
 
-// ----- Sample Playback REMOVED -----
-// Audio samples functionality has been removed as requested
+// ----- Audio Sample System -----
+const audioCache = new Map();
+
+async function loadAudioSample(note) {
+  if (audioCache.has(note)) return audioCache.get(note);
+  
+  try {
+    const audio = new Audio(`audio/${note}.mp3`);
+    audio.preload = 'auto';
+    audioCache.set(note, audio);
+    return audio;
+  } catch (e) {
+    console.warn(`Could not load audio sample for ${note}`);
+    return null;
+  }
+}
+
+async function playAudioSample(stepWhite, octave) {
+  if (!state.audioEnabled) return;
+  
+  const noteKey = `${stepWhite}${octave}`;
+  try {
+    const audio = await loadAudioSample(noteKey);
+    if (audio) {
+      audio.currentTime = 0;
+      await audio.play();
+    }
+  } catch (e) {
+    console.warn(`Could not play audio sample for ${noteKey}`);
+  }
+}
+
+// Preload common samples
+async function preloadAudioSamples() {
+  if (!state.audioEnabled) return;
+  
+  const commonNotes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'];
+  for (const note of commonNotes) {
+    await loadAudioSample(note);
+  }
+}
 
 // ----- Correctness Logic -----
 function handleIncomingMidi(midi){
@@ -806,7 +1018,15 @@ function handleIncomingMidi(midi){
 }
 
 function onCorrect(stepWhite, octave){
-  // Removed playSample call
+  // Start timer on first note press
+  if(!state.timerStarted) {
+    startTimer();
+    state.timerStarted = true;
+  }
+  
+  // Play audio sample if enabled
+  playAudioSample(stepWhite, octave);
+  
   state.idx++; 
   
   // Fun feedback messages for children
@@ -831,8 +1051,91 @@ function onCorrect(stepWhite, octave){
 }
 
 function showCompletionPopup() {
-  completionTime.textContent = state.elapsed;
+  const userTime = state.elapsed;
+  const targetTime = getSongTargetTime(state.songKey);
+  
+  completionTimeDisplay.textContent = `${userTime}s`;
+  
+  // Update comparison graph
+  updateComparisonGraph(userTime, targetTime);
+  
+  // Show celebration message and effects
+  showCelebrationEffects(userTime, targetTime);
+  
   completionModal.classList.remove('hidden');
+}
+
+function getSongTargetTime(songKey) {
+  // Target times for built-in songs (in seconds)
+  const targets = {
+    'twinkle': 8,
+    'mary': 6,
+    'uploaded': 10 // Default for uploaded songs
+  };
+  return targets[songKey] || 10;
+}
+
+function updateComparisonGraph(userTime, targetTime) {
+  const maxTime = Math.max(userTime, targetTime) * 1.2; // Add some padding
+  
+  // Calculate bar widths as percentages
+  const targetWidth = (targetTime / maxTime) * 100;
+  const userWidth = (userTime / maxTime) * 100;
+  
+  // Update target bar
+  el('targetBar').style.width = targetWidth + '%';
+  el('targetTime').textContent = targetTime + 's';
+  
+  // Update user bar with appropriate styling
+  const userBar = el('userBar');
+  userBar.style.width = userWidth + '%';
+  el('userTime').textContent = userTime + 's';
+  
+  // Apply different styles based on performance
+  userBar.className = 'graph-bar-fill user-bar';
+  if (userTime <= targetTime) {
+    userBar.classList.add('excellent');
+  } else if (userTime <= targetTime * 1.2) {
+    userBar.classList.add('better');
+  }
+}
+
+function showCelebrationEffects(userTime, targetTime) {
+  const celebrationEl = el('celebrationMessage');
+  
+  if (userTime <= targetTime) {
+    // Excellent performance - under target time
+    celebrationEl.textContent = '🎊 AMAZING! Under target time! 🎊';
+    createConfetti();
+  } else if (userTime <= targetTime * 1.2) {
+    // Good performance - close to target
+    celebrationEl.textContent = '⭐ Great job! Almost perfect! ⭐';
+  } else if (state.lastTimes[state.songKey] && userTime < state.lastTimes[state.songKey]) {
+    // Improvement from last time
+    celebrationEl.textContent = '📈 You\'re getting better! 📈';
+  } else {
+    // First try or needs improvement
+    celebrationEl.textContent = '🎵 Keep practicing! 🎵';
+  }
+}
+
+function createConfetti() {
+  const popup = document.querySelector('.completion-popup');
+  const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#a55eea'];
+  
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.top = Math.random() * 50 + '%';
+      confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+      confetti.style.animationDelay = Math.random() * 0.5 + 's';
+      popup.appendChild(confetti);
+      
+      setTimeout(() => confetti.remove(), 2000);
+    }, i * 50);
+  }
 }
 
 function onWrong(msg){ 

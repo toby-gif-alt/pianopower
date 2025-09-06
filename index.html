@@ -120,7 +120,23 @@
     .timeline { height:72px; border-radius:16px; background:#ffffffcf; border:1px solid #e5e7eb; padding:8px; display:flex; gap:8px; overflow:hidden; }
     .noteBlock { min-width:12%; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; box-shadow: var(--shadow); }
     /* Enhanced star animation with platform jumping */
-    .scene { position:relative; height:240px; border-radius:20px; overflow:hidden; background: linear-gradient(180deg,#0b102d,#1e3a8a); box-shadow: inset 0 -40px 80px rgba(0,0,0,.3); }
+    .scene { 
+      position:relative; 
+      height:240px; 
+      border-radius:20px; 
+      overflow:hidden; 
+      background: linear-gradient(180deg,#0b102d,#1e3a8a); 
+      box-shadow: inset 0 -40px 80px rgba(0,0,0,.3);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .scene.mary-background {
+      background-image: url('images/mary background.png');
+    }
+    .scene.twinkle-background {
+      background-image: url('images/twinkle background.png');
+    }
     .bed { position:absolute; left:0; right:0; bottom:0; height:56px; background: #fde68a99; backdrop-filter: blur(2px); }
     .plat { position:absolute; left:24px; right:24px; height:4px; background:#ffffff66; border-radius:999px; }
     /* Hide platforms behind characters */
@@ -130,41 +146,80 @@
       position:absolute; 
       left:50%; 
       transform:translateX(-50%); 
-      width:70px; 
+      width:60px; 
+      height:60px;
       transition: transform .6s cubic-bezier(.68,-0.55,.265,1.55); 
       z-index: 10;
     }
     
-    /* Lamb animation for Mary's song */
+    .star-effect {
+      position:absolute; 
+      left:50%; 
+      transform:translateX(-50%); 
+      width:120px; 
+      height:30px;
+      transition: opacity 0.5s ease-in-out; 
+      z-index: 11;
+      top: -20px; /* Position at top of scene */
+    }
+    
+    /* Lamb animation for Mary's song - PNG sprite */
     .lamb {
       position: absolute;
       bottom: 56px;
       left: 0;
-      width: 60px;
-      height: 60px;
+      width: 96px; /* Show one frame of the 1024x96 sprite (1024/4 = 256, but scale down) */
+      height: 96px;
       transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
       z-index: 10;
+      object-fit: none;
+      object-position: -864px 0; /* Start with the rightmost frame (resting state) */
     }
     
-    /* Mary character at the end */
+    /* Mary character at the end - PNG image */
     .mary {
       position: absolute;
-      bottom: 56px;
+      bottom: 70px; /* Position on grass level */
       right: 20px;
-      width: 70px;
-      height: 70px;
+      width: 64px; /* 32x32 scaled up 2x */
+      height: 64px;
       z-index: 10;
+      image-rendering: pixelated; /* Keep pixel art crisp */
     }
     
-    /* Lamb jumping animation */
+    /* Lamb jumping animation with sprite cycling */
     @keyframes lambJump {
-      0% { transform: translateY(0px) scale(1); }
-      15% { transform: translateY(-15px) scale(1.05); }
-      30% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(0px) scale(1); }
+      0% { 
+        transform: translateY(0px) scale(1); 
+        object-position: -864px 0; /* Resting state (rightmost frame) */
+      }
+      15% { 
+        transform: translateY(-15px) scale(1.05); 
+        object-position: -576px 0; /* Jump frame 1 */
+      }
+      30% { 
+        transform: translateY(-20px) scale(1.1); 
+        object-position: -288px 0; /* Jump frame 2 */
+      }
+      45% { 
+        transform: translateY(-15px) scale(1.05); 
+        object-position: 0 0; /* Jump frame 3 (leftmost) */
+      }
+      60% { 
+        transform: translateY(0px) scale(1); 
+        object-position: -288px 0; /* Jump frame 2 */
+      }
+      75% { 
+        transform: translateY(0px) scale(1); 
+        object-position: -576px 0; /* Jump frame 1 */
+      }
+      100% { 
+        transform: translateY(0px) scale(1); 
+        object-position: -864px 0; /* Back to resting state */
+      }
     }
     
-    .lamb.jumping { animation: lambJump 0.6s cubic-bezier(.68,-0.55,.265,1.55); }
+    .lamb.jumping { animation: lambJump 0.8s cubic-bezier(.68,-0.55,.265,1.55); }
     
     /* Enhanced platform jumping animation */
     @keyframes starJump {
@@ -415,69 +470,17 @@
         <div class="plat" style="bottom:148px"></div>
         <div class="plat" style="bottom:188px"></div>
         
-        <!-- Star for other songs with house -->
-        <svg class="star" id="star" viewBox="0 0 100 100">
-          <!-- House (visible at start) -->
-          <g id="starHouse">
-            <!-- House base -->
-            <rect x="20" y="70" width="60" height="25" fill="#8b4513" stroke="#654321" stroke-width="1"/>
-            <!-- House roof -->
-            <polygon points="15,70 50,50 85,70" fill="#dc2626" stroke="#b91c1c" stroke-width="1"/>
-            <!-- Door -->
-            <rect x="45" y="80" width="10" height="15" fill="#4a5568" stroke="#2d3748" stroke-width="0.5"/>
-            <!-- Window -->
-            <rect x="30" y="75" width="8" height="8" fill="#60a5fa" stroke="#3b82f6" stroke-width="0.5"/>
-            <rect x="62" y="75" width="8" height="8" fill="#60a5fa" stroke="#3b82f6" stroke-width="0.5"/>
-          </g>
-          <!-- Star character -->
-          <polygon points="50,5 61,38 95,38 67,58 78,90 50,70 22,90 33,58 5,38 39,38" fill="#ffd26a" stroke="#f59e0b" stroke-width="3"/>
-          <circle cx="40" cy="42" r="5" fill="#00000033"/>
-          <circle cx="60" cy="42" r="5" fill="#00000033"/>
-          <path d="M35 60 Q50 70 65 60" stroke="#00000044" stroke-width="4" fill="none"/>
-        </svg>
+        <!-- Star for other songs (now using PNG) -->
+        <img class="star" id="star" src="images/star.png" style="display: block;" />
         
-        <!-- Lamb for Mary Had a Little Lamb -->
-        <svg class="lamb" id="lamb" viewBox="0 0 100 100" style="display: none;">
-          <!-- Lamb body -->
-          <ellipse cx="50" cy="65" rx="25" ry="18" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
-          <!-- Lamb head -->
-          <circle cx="35" cy="45" r="15" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
-          <!-- Ears -->
-          <ellipse cx="28" cy="35" rx="4" ry="8" fill="#f8f9fa" stroke="#e9ecef" stroke-width="1"/>
-          <ellipse cx="42" cy="35" rx="4" ry="8" fill="#f8f9fa" stroke="#e9ecef" stroke-width="1"/>
-          <!-- Eyes -->
-          <circle cx="30" cy="42" r="2" fill="#000"/>
-          <circle cx="40" cy="42" r="2" fill="#000"/>
-          <!-- Nose -->
-          <ellipse cx="35" cy="48" rx="2" ry="1" fill="#000"/>
-          <!-- Legs -->
-          <rect x="40" y="78" width="3" height="12" fill="#000"/>
-          <rect x="45" y="78" width="3" height="12" fill="#000"/>
-          <rect x="55" y="78" width="3" height="12" fill="#000"/>
-          <rect x="60" y="78" width="3" height="12" fill="#000"/>
-          <!-- Tail -->
-          <circle cx="75" cy="60" r="3" fill="#f8f9fa" stroke="#e9ecef" stroke-width="1"/>
-        </svg>
+        <!-- Star effect for Twinkle ending -->
+        <img class="star-effect" id="starEffect" src="images/stareffect.png" style="display: none;" />
         
-        <!-- Mary character at the end -->
-        <svg class="mary" id="mary" viewBox="0 0 100 100" style="display: none;">
-          <!-- Mary's dress -->
-          <polygon points="50,50 35,85 65,85" fill="#6366f1" stroke="#4f46e5" stroke-width="2"/>
-          <!-- Mary's body -->
-          <ellipse cx="50" cy="45" rx="8" ry="12" fill="#fbbf24"/>
-          <!-- Mary's head -->
-          <circle cx="50" cy="30" r="10" fill="#fbbf24"/>
-          <!-- Hair -->
-          <path d="M40 25 Q50 20 60 25 Q55 15 45 15 Q40 20 40 25" fill="#7c2d12"/>
-          <!-- Eyes -->
-          <circle cx="46" cy="28" r="1" fill="#000"/>
-          <circle cx="54" cy="28" r="1" fill="#000"/>
-          <!-- Smile -->
-          <path d="M46 33 Q50 36 54 33" stroke="#000" stroke-width="1" fill="none"/>
-          <!-- Arms -->
-          <ellipse cx="42" cy="48" rx="3" ry="8" fill="#fbbf24"/>
-          <ellipse cx="58" cy="48" rx="3" ry="8" fill="#fbbf24"/>
-        </svg>
+        <!-- Lamb for Mary Had a Little Lamb (now using PNG sprite) -->
+        <img class="lamb" id="lamb" src="images/sheep.png" style="display: none;" />
+        
+        <!-- Mary character at the end (now using PNG) -->
+        <img class="mary" id="mary" src="images/mary.png" style="display: none;" />
       </div>
 
       <div class="timeline" id="timeline"></div>
@@ -538,15 +541,17 @@ const BLACK = ['C#','D#','F#','G#','A#'];
 const STEPS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const C4 = 60; // middle C
 
-// Built-in songs (as step+octave sequences)
+// Built-in songs (as step+octave sequences) - now loaded from MIDI files
 const SONGS = {
   twinkle: {
     title: 'Twinkle Twinkle Little Star',
-    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4'],
+    midiFile: 'midi/twinkle-twinkle-little-star.mid'
   },
   mary: {
     title: 'Mary Had a Little Lamb',
-    notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4']
+    notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4'],
+    midiFile: 'midi/mary-had-a-little-lamb.mid'
   }
 };
 
@@ -670,8 +675,39 @@ function startGameWithSong(songKey) {
   state.songKey = songKey;
   const song = SONGS[songKey];
   songTitleLbl.textContent = song.title;
-  state.queue = song.notes.map(toObj);
-  startGame();
+  
+  // Try to load MIDI file first, fall back to hardcoded notes
+  if (song.midiFile) {
+    loadBuiltInMIDI(song.midiFile, songKey);
+  } else {
+    state.queue = song.notes.map(toObj);
+    startGame();
+  }
+}
+
+async function loadBuiltInMIDI(midiPath, songKey) {
+  try {
+    const response = await fetch(midiPath);
+    if (!response.ok) throw new Error('MIDI file not found');
+    
+    const arrayBuffer = await response.arrayBuffer();
+    const notes = await parseMIDIBuffer(arrayBuffer);
+    
+    if (notes && notes.length > 0) {
+      state.queue = postProcessSequence(notes);
+      startGame();
+    } else {
+      // Fall back to hardcoded notes
+      console.warn(`Could not parse MIDI file ${midiPath}, using hardcoded notes`);
+      state.queue = SONGS[songKey].notes.map(toObj);
+      startGame();
+    }
+  } catch (error) {
+    console.warn(`Could not load MIDI file ${midiPath}:`, error);
+    // Fall back to hardcoded notes
+    state.queue = SONGS[songKey].notes.map(toObj);
+    startGame();
+  }
 }
 
 function startGame(){
@@ -789,10 +825,20 @@ function renderKeyboard(active){
 // ----- Enhanced Animation System (Star for other songs, Lamb for Mary) -----
 function placeStar(){
   const isMarySong = state.songKey === 'mary';
+  const scene = document.getElementById('scene');
+  
+  // Set appropriate background
+  scene.className = 'scene';
+  if(isMarySong) {
+    scene.classList.add('mary-background');
+  } else {
+    scene.classList.add('twinkle-background');
+  }
   
   if(isMarySong) {
-    // Show lamb and Mary, hide star
+    // Show lamb and Mary, hide star and star effect
     star.style.display = 'none';
+    document.getElementById('starEffect').style.display = 'none';
     lamb.style.display = 'block';
     mary.style.display = 'block';
     placeLamb();
@@ -801,36 +847,35 @@ function placeStar(){
     star.style.display = 'block';
     lamb.style.display = 'none';
     mary.style.display = 'none';
-    placeStarDefault();
+    placeStarForTwinkle();
   }
 }
 
-function placeStarDefault(){
+function placeStarForTwinkle(){
   const total = state.queue.length || 1;
   const progress = Math.min(state.idx/total,1);
   
-  // Show/hide house based on progress
-  const house = document.getElementById('starHouse');
-  if (house) {
-    house.style.display = progress < 0.1 ? 'block' : 'none';
+  // Star starts small in house window, grows to 1/4 background size at middle,
+  // then shrinks back to window size, ending at top
+  let scale, y;
+  
+  if (progress <= 0.5) {
+    // First half: grow from small (house window size) to big (1/4 background)
+    scale = 0.3 + (progress * 2) * 0.7; // 0.3 to 1.0
+    // Move from bottom house area toward middle
+    y = 180 - (progress * 2) * 120; // From 180 to 60
+  } else {
+    // Second half: shrink back down and move to top
+    const secondHalf = (progress - 0.5) * 2; // 0 to 1
+    scale = 1.0 - secondHalf * 0.7; // 1.0 to 0.3
+    // Move from middle to top
+    y = 60 - secondHalf * 80; // From 60 to -20 (top)
   }
-  
-  // Platform positions from bottom: ground, 28px, 68px, 108px, 148px, 188px (top of sky)
-  const platforms = [180, 152, 112, 72, 32, -8]; // Y positions for star (accounting for star height)
-  const currentPlatform = Math.floor(progress * (platforms.length - 1));
-  const nextPlatform = Math.min(currentPlatform + 1, platforms.length - 1);
-  
-  // Interpolate between platforms for smooth movement between jumps
-  const platformProgress = (progress * (platforms.length - 1)) - currentPlatform;
-  const y = platforms[currentPlatform] + (platforms[nextPlatform] - platforms[currentPlatform]) * platformProgress;
-  
-  // Scale gets smaller as star goes higher into the night sky
-  const scale = 1 - progress * 0.6;
   
   // Remove jumping class to reset animation
   star.classList.remove('jumping');
   
-  // Set position
+  // Set position and scale
   star.style.transform = `translateX(-50%) translateY(${y}px) scale(${scale})`;
   
   // Add jumping animation when moving to next note (but not on first note)
@@ -840,11 +885,17 @@ function placeStarDefault(){
   }
   
   if(state.finished){ 
-    star.classList.add('twinkle'); 
-    star.classList.add('small'); 
-    // Hide house when finished
-    if (house) house.style.display = 'none';
+    // Show star effect at the top and hide the star
+    star.style.display = 'none';
+    const starEffect = document.getElementById('starEffect');
+    starEffect.style.display = 'block';
+    starEffect.style.opacity = '1';
+    
+    // Add twinkling to the effect
+    starEffect.classList.add('twinkle');
   } else { 
+    // Make sure star effect is hidden during gameplay
+    document.getElementById('starEffect').style.display = 'none';
     star.classList.remove('twinkle'); 
     star.classList.remove('small'); 
   }
@@ -961,46 +1012,58 @@ function autoCorrelate(buf, sr){
   if(bestCorr>0.01) return sr/best; return -1;
 }
 
-// ----- Audio Sample System -----
-const audioCache = new Map();
+// ----- Simple Audio Tone System -----
+let audioContext = null;
 
-async function loadAudioSample(note) {
-  if (audioCache.has(note)) return audioCache.get(note);
-  
-  try {
-    const audio = new Audio(`audio/${note}.mp3`);
-    audio.preload = 'auto';
-    audioCache.set(note, audio);
-    return audio;
-  } catch (e) {
-    console.warn(`Could not load audio sample for ${note}`);
-    return null;
+function initAudioContext() {
+  if (!audioContext && state.audioEnabled) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
+  return audioContext;
 }
 
-async function playAudioSample(stepWhite, octave) {
+function playNoteTone(stepWhite, octave) {
   if (!state.audioEnabled) return;
   
-  const noteKey = `${stepWhite}${octave}`;
-  try {
-    const audio = await loadAudioSample(noteKey);
-    if (audio) {
-      audio.currentTime = 0;
-      await audio.play();
-    }
-  } catch (e) {
-    console.warn(`Could not play audio sample for ${noteKey}`);
-  }
-}
-
-// Preload common samples
-async function preloadAudioSamples() {
-  if (!state.audioEnabled) return;
+  const ctx = initAudioContext();
+  if (!ctx) return;
   
-  const commonNotes = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'];
-  for (const note of commonNotes) {
-    await loadAudioSample(note);
+  // Resume audio context if suspended (browser policy)
+  if (ctx.state === 'suspended') {
+    ctx.resume();
   }
+  
+  // Calculate frequency for the note
+  const noteFrequencies = {
+    'C': 261.63, 'D': 293.66, 'E': 329.63, 'F': 349.23,
+    'G': 392.00, 'A': 440.00, 'B': 493.88
+  };
+  
+  let frequency = noteFrequencies[stepWhite];
+  if (!frequency) return;
+  
+  // Adjust for octave (4 is the base octave)
+  const octaveMultiplier = Math.pow(2, octave - 4);
+  frequency *= octaveMultiplier;
+  
+  // Create oscillator for the tone
+  const oscillator = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  
+  oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+  oscillator.type = 'sine';
+  
+  // Envelope: quick attack, sustain, quick decay
+  gainNode.gain.setValueAtTime(0, ctx.currentTime);
+  gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.01);
+  gainNode.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.3);
+  gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5);
+  
+  oscillator.start(ctx.currentTime);
+  oscillator.stop(ctx.currentTime + 0.5);
 }
 
 // ----- Correctness Logic -----
@@ -1024,8 +1087,8 @@ function onCorrect(stepWhite, octave){
     state.timerStarted = true;
   }
   
-  // Play audio sample if enabled
-  playAudioSample(stepWhite, octave);
+  // Play audio tone if enabled
+  playNoteTone(stepWhite, octave);
   
   state.idx++; 
   
@@ -1176,14 +1239,18 @@ function postProcessSequence(seq){
   return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4))}));
 }
 
-async function parseMIDI(file){
-  const buf = await file.arrayBuffer();
+async function parseMIDIBuffer(buf){
   // Use ToneJS MIDI via esm.sh
   const mod = await import('https://esm.sh/@tonejs/midi@2.0.28');
   const midi = new mod.Midi(buf);
   const notes=[]; const track=midi.tracks[0];
   track.notes.forEach(n=>{ const obj=fromMidi(n.midi); if(WHITE.includes(obj.stepWhite)) notes.push(obj); });
   return notes;
+}
+
+async function parseMIDI(file){
+  const buf = await file.arrayBuffer();
+  return await parseMIDIBuffer(buf);
 }
 
 // MusicXML parsing removed - MIDI only now

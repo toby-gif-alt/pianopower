@@ -431,6 +431,20 @@
       <!-- Big song choice buttons -->
       <div class="center">
         <h2>Choose Your Song! 🎵</h2>
+        
+        <!-- Easy versions -->
+        <h3 style="margin: 24px 0 16px 0; color: #22c55e;">🌟 Easy Versions</h3>
+        <div class="song-grid">
+          <button class="big-btn" id="chooseTwinkleEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            ⭐ Twinkle Twinkle (Easy)
+          </button>
+          <button class="big-btn" id="chooseMaryEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🐑 Mary Had a Little Lamb (Easy)
+          </button>
+        </div>
+        
+        <!-- Full versions -->
+        <h3 style="margin: 32px 0 16px 0; color: var(--big-button);">🎼 Full Versions</h3>
         <div class="song-grid">
           <button class="big-btn" id="chooseTwinkle">
             ⭐ Twinkle Twinkle Little Star
@@ -543,6 +557,16 @@ const SONGS = {
     title: 'Mary Had a Little Lamb', 
     notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4'],
     midiFile: 'midi/mary-had-a-little-lamb.mid'
+  },
+  twinkleEasy: {
+    title: 'Twinkle Twinkle Little Star (Easy)',
+    notes: ['C4','C4','G4','G4','F4','F4','E4','E4','D4','D4','C4'],
+    // No midiFile - uses only hardcoded notes
+  },
+  maryEasy: {
+    title: 'Mary Had a Little Lamb (Easy)', 
+    notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4'],
+    // No midiFile - uses only hardcoded notes
   }
 };
 
@@ -617,6 +641,8 @@ el('nextToSongs').onclick = ()=>{
 el('backToWelcome').onclick = ()=>{ swap(songSelection, welcome); };
 el('chooseTwinkle').onclick = ()=>{ startGameWithSong('twinkle'); };
 el('chooseMary').onclick = ()=>{ startGameWithSong('mary'); };
+el('chooseTwinkleEasy').onclick = ()=>{ startGameWithSong('twinkleEasy'); };
+el('chooseMaryEasy').onclick = ()=>{ startGameWithSong('maryEasy'); };
 el('startWithUpload').onclick = ()=>{ 
   const file = el('file').files[0];
   if(file) {
@@ -1415,8 +1441,33 @@ function parseTrack(view, startOffset, trackLength) {
 
 // MusicXML parsing removed - MIDI only now
 
+// Auto-detect MIDI devices and switch mode if available
+async function autoDetectMIDI() {
+  try {
+    if (navigator.requestMIDIAccess) {
+      console.log('Checking for MIDI devices...');
+      const midiAccess = await navigator.requestMIDIAccess();
+      if (midiAccess.inputs.size > 0) {
+        console.log('MIDI device detected, auto-switching to MIDI mode');
+        // Switch to MIDI mode
+        pick('mode', 'midi', ['modeMic','modeMIDI']);
+      } else {
+        console.log('No MIDI devices found');
+      }
+    } else {
+      console.log('Web MIDI API not supported in this browser');
+    }
+  } catch (error) {
+    console.log('MIDI auto-detection failed:', error);
+    // Keep default microphone mode
+  }
+}
+
 // Initial render
 renderTimeline(); renderKeyboard(); renderPrompt(); placeStar();
+
+// Auto-detect MIDI on page load
+autoDetectMIDI();
 </script>
 </body>
 </html>

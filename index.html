@@ -137,6 +137,17 @@
     .scene.twinkle-background {
       background-image: url('images/twinkle background.png');
     }
+    /* For uploaded songs: smaller scene, bigger keyboard */
+    .uploaded-layout .scene {
+      height: 120px; /* Reduced from 240px */
+    }
+    .uploaded-layout .kbd {
+      padding: 20px; /* Increased from 10px */
+    }
+    .uploaded-layout .white {
+      height: 140px; /* Increased from 120px */
+      min-width: 50px; /* Increased from 44px */
+    }
     /* Characters have higher z-index */
     .star, .lamb, .mary { z-index: 10; }
     .star { 
@@ -560,13 +571,13 @@ const SONGS = {
   },
   twinkleEasy: {
     title: 'Twinkle Twinkle Little Star (Easy)',
-    notes: ['C4','C4','G4','G4','F4','F4','E4','E4','D4','D4','C4'],
-    // No midiFile - uses only hardcoded notes
+    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4'],
+    // No midiFile - uses only hardcoded notes (fallback = normal version)
   },
   maryEasy: {
     title: 'Mary Had a Little Lamb (Easy)', 
-    notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4'],
-    // No midiFile - uses only hardcoded notes
+    notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4'],
+    // No midiFile - uses only hardcoded notes (fallback = normal version)
   }
 };
 
@@ -855,12 +866,24 @@ function renderKeyboard(active){
 
 // ----- Enhanced Animation System (Star for other songs, Lamb for Mary) -----
 function placeStar(){
-  const isMarySong = state.songKey === 'mary';
+  const isMarySong = state.songKey === 'mary' || state.songKey === 'maryEasy';
+  const isUploadedSong = state.songKey === 'uploaded';
   const scene = document.getElementById('scene');
+  const playSection = document.getElementById('play');
+  
+  // Handle uploaded song layout
+  if (isUploadedSong) {
+    playSection.classList.add('uploaded-layout');
+  } else {
+    playSection.classList.remove('uploaded-layout');
+  }
   
   // Set appropriate background
   scene.className = 'scene';
-  if(isMarySong) {
+  if (isUploadedSong) {
+    // For uploaded songs, no background image - just basic scene
+    // This will show no background image, making piano more prominent
+  } else if(isMarySong) {
     scene.classList.add('mary-background');
   } else {
     scene.classList.add('twinkle-background');

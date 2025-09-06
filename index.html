@@ -608,17 +608,18 @@ function buildOctaveKeys(octave, active) {
   }
   
   // Add black keys positioned between white keys
+  // Use percentage-based positioning that works with flexbox layout
   const blackPositions = [
-    { after: 0, step: 'C#' }, // After C
-    { after: 1, step: 'D#' }, // After D
-    { after: 3, step: 'F#' }, // After F
-    { after: 4, step: 'G#' }, // After G
-    { after: 5, step: 'A#' }  // After A
+    { leftPercent: 'calc(14.28% - 15px)', step: 'C#' }, // Between C and D
+    { leftPercent: 'calc(28.56% - 15px)', step: 'D#' }, // Between D and E  
+    { leftPercent: 'calc(57.12% - 15px)', step: 'F#' }, // Between F and G
+    { leftPercent: 'calc(71.4% - 15px)', step: 'G#' },  // Between G and A
+    { leftPercent: 'calc(85.68% - 15px)', step: 'A#' }  // Between A and B
   ];
   
-  blackPositions.forEach(({ after, step }) => {
+  blackPositions.forEach(({ leftPercent, step }) => {
     const blackKey = buildKey(step, octave, active, true);
-    blackKey.style.left = `${after * 50 + 35}px`; // Position between white keys
+    blackKey.style.left = leftPercent;
     container.appendChild(blackKey);
   });
   

@@ -137,11 +137,8 @@
     .scene.twinkle-background {
       background-image: url('images/twinkle background.png');
     }
-    .bed { position:absolute; left:0; right:0; bottom:0; height:56px; background: #fde68a99; backdrop-filter: blur(2px); }
-    .plat { position:absolute; left:24px; right:24px; height:4px; background:#ffffff66; border-radius:999px; }
-    /* Hide platforms behind characters */
+    /* Characters have higher z-index */
     .star, .lamb, .mary { z-index: 10; }
-    .plat { z-index: 1; }
     .star { 
       position:absolute; 
       left:50%; 
@@ -166,7 +163,7 @@
     /* Lamb animation for Mary's song - PNG sprite */
     .lamb {
       position: absolute;
-      bottom: 56px;
+      bottom: 0px;
       left: 0;
       width: 96px; /* Show one frame of the 1024x96 sprite (1024/4 = 256, but scale down) */
       height: 96px;
@@ -179,7 +176,7 @@
     /* Mary character at the end - PNG image */
     .mary {
       position: absolute;
-      bottom: 70px; /* Position on grass level */
+      bottom: 14px; /* Position on ground level */
       right: 20px;
       width: 64px; /* 32x32 scaled up 2x */
       height: 64px;
@@ -463,12 +460,6 @@
       </div>
 
       <div class="scene" id="scene">
-        <div class="bed"></div>
-        <div class="plat" style="bottom:28px"></div>
-        <div class="plat" style="bottom:68px"></div>
-        <div class="plat" style="bottom:108px"></div>
-        <div class="plat" style="bottom:148px"></div>
-        <div class="plat" style="bottom:188px"></div>
         
         <!-- Star for other songs (now using PNG) -->
         <img class="star" id="star" src="images/star.png" style="display: block;" />

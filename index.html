@@ -686,28 +686,10 @@ function startGameWithSong(songKey) {
 }
 
 async function loadBuiltInMIDI(midiPath, songKey) {
-  try {
-    const response = await fetch(midiPath);
-    if (!response.ok) throw new Error('MIDI file not found');
-    
-    const arrayBuffer = await response.arrayBuffer();
-    const notes = await parseMIDIBuffer(arrayBuffer);
-    
-    if (notes && notes.length > 0) {
-      state.queue = postProcessSequence(notes);
-      startGame();
-    } else {
-      // Fall back to hardcoded notes
-      console.warn(`Could not parse MIDI file ${midiPath}, using hardcoded notes`);
-      state.queue = SONGS[songKey].notes.map(toObj);
-      startGame();
-    }
-  } catch (error) {
-    console.warn(`Could not load MIDI file ${midiPath}:`, error);
-    // Fall back to hardcoded notes
-    state.queue = SONGS[songKey].notes.map(toObj);
-    startGame();
-  }
+  // For now, skip MIDI loading and use hardcoded notes due to external dependency issues
+  console.log(`Using hardcoded notes for ${songKey} (MIDI parsing temporarily disabled)`);
+  state.queue = SONGS[songKey].notes.map(toObj);
+  startGame();
 }
 
 function startGame(){
@@ -753,6 +735,15 @@ function buildKey(step, octave, active, isBlack = false){
       d.style.background = COLORS[step];
     }
   }
+  
+  // Add click handler for direct key interaction
+  d.style.cursor = 'pointer';
+  d.addEventListener('click', () => {
+    const noteStep = step.replace('#', '');
+    const noteIndex = STEPS.indexOf(step);
+    const midiNote = (octave + 1) * 12 + noteIndex;
+    handleIncomingMidi(midiNote);
+  });
   
   const l = document.createElement('div'); 
   l.className='lbl'; 
@@ -996,7 +987,10 @@ async function startMic(){
     const loop=()=>{ if(!running) return; analyser.getFloatTimeDomainData(buf); const f=autoCorrelate(buf, ctx.sampleRate); if(f>0){ const midi=Math.round(69+12*Math.log2(f/440)); handleIncomingMidi(midi,true); } requestAnimationFrame(loop); };
     loop();
     stopMicFn=()=>{ running=false; stream.getTracks().forEach(t=>t.stop()); ctx.close(); };
-  }catch(e){ alert('Microphone access failed. Check permissions.'); }
+  }catch(e){ 
+    console.log('Microphone access failed, enabling keyboard click mode');
+    feedback.textContent = 'Microphone unavailable - click piano keys to play! 🎹';
+  }
 }
 function stopMic(){ if(stopMicFn){ stopMicFn(); stopMicFn=null; } }
 function stopInputs(){ stopMIDI(); stopMic(); }
@@ -1240,17 +1234,13 @@ function postProcessSequence(seq){
 }
 
 async function parseMIDIBuffer(buf){
-  // Use ToneJS MIDI via esm.sh
-  const mod = await import('https://esm.sh/@tonejs/midi@2.0.28');
-  const midi = new mod.Midi(buf);
-  const notes=[]; const track=midi.tracks[0];
-  track.notes.forEach(n=>{ const obj=fromMidi(n.midi); if(WHITE.includes(obj.stepWhite)) notes.push(obj); });
-  return notes;
+  // MIDI parsing temporarily disabled due to external dependency issues
+  return [];
 }
 
 async function parseMIDI(file){
-  const buf = await file.arrayBuffer();
-  return await parseMIDIBuffer(buf);
+  // MIDI parsing temporarily disabled due to external dependency issues
+  return [];
 }
 
 // MusicXML parsing removed - MIDI only now

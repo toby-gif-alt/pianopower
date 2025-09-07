@@ -1334,48 +1334,11 @@ async function parseMIDIBuffer(buf){
     const sortedNotes = allNotes.sort((a, b) => a.time - b.time);
     const convertedNotes = sortedNotes.map(note => fromMidi(note.note));
     
-    // For built-in songs, the MIDI files often contain the complete song with multiple verses
-    // but the game only expects the first verse/line. Check if we have a reasonable
-    // truncation point by looking for the expected pattern length.
-    function truncateToFirstPattern(notes) {
-      // For most children's songs, the first verse is typically 12-16 notes
-      // Look for a natural break point where the pattern might repeat or change
-      
-      if (notes.length <= 16) return notes; // Already short enough
-      
-      // Try common song lengths for children's songs
-      const commonLengths = [14, 12, 16, 13, 15];
-      
-      for (const length of commonLengths) {
-        if (length < notes.length) {
-          // Check if truncating here makes sense by seeing if the next part
-          // starts to repeat or significantly differ
-          const firstPart = notes.slice(0, length);
-          const nextPart = notes.slice(length, length + Math.min(4, notes.length - length));
-          
-          // If we have a reasonable first part and the next part starts differently,
-          // this might be a good truncation point
-          if (firstPart.length === length && nextPart.length >= 2) {
-            // If the pattern changes significantly, this is likely a good break point
-            if (!nextPart.slice(0, 2).every((note, idx) => {
-              const endIdx = firstPart.length - 2 + idx;
-              return endIdx >= 0 && endIdx < firstPart.length && 
-                     firstPart[endIdx].step === note.step && 
-                     firstPart[endIdx].octave === note.octave;
-            })) {
-              console.log(`Truncating MIDI sequence at ${length} notes (detected verse break)`);
-              return firstPart;
-            }
-          }
-        }
-      }
-      
-      return notes; // No good truncation point found
-    }
+    // Load the full MIDI file without truncation
+    // Users want all notes from the MIDI files to be available
+    console.log(`Loaded ${convertedNotes.length} notes from MIDI file without truncation`);
     
-    const truncatedNotes = truncateToFirstPattern(convertedNotes);
-    
-    return truncatedNotes;
+    return convertedNotes;
     
   } catch (error) {
     console.error('MIDI parsing error:', error);

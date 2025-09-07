@@ -1078,7 +1078,7 @@ function initAudioContext() {
   return audioContext;
 }
 
-function playNoteTone(stepWhite, octave) {
+function playNoteTone(step, octave) {
   if (!state.audioEnabled) return;
   
   const ctx = initAudioContext();
@@ -1089,18 +1089,20 @@ function playNoteTone(stepWhite, octave) {
     ctx.resume();
   }
   
-  // Calculate frequency for the note
-  const noteFrequencies = {
-    'C': 261.63, 'D': 293.66, 'E': 329.63, 'F': 349.23,
-    'G': 392.00, 'A': 440.00, 'B': 493.88
+  // Calculate frequency for any note including sharps/flats
+  // Using A4 = 440Hz as reference and equal temperament
+  const noteToSemitone = {
+    'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+    'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
   };
   
-  let frequency = noteFrequencies[stepWhite];
-  if (!frequency) return;
+  const semitone = noteToSemitone[step];
+  if (semitone === undefined) return;
   
-  // Adjust for octave (4 is the base octave)
-  const octaveMultiplier = Math.pow(2, octave - 4);
-  frequency *= octaveMultiplier;
+  // Calculate frequency using A4 = 440Hz as reference
+  // Formula: f = 440 * 2^((n-69)/12) where n is MIDI note number
+  const midiNote = (octave + 1) * 12 + semitone;
+  const frequency = 440 * Math.pow(2, (midiNote - 69) / 12);
   
   // Create oscillator for the tone
   const oscillator = ctx.createOscillator();
@@ -1127,24 +1129,24 @@ function handleIncomingMidi(midi){
   const exp = state.expected(); if(!exp) return;
   const got = fromMidi(midi);
   if(state.difficulty==='easy'){
-    if(got.stepWhite===exp.stepWhite){ onCorrect(exp.stepWhite, 4); }
+    if(got.stepWhite===exp.stepWhite){ onCorrect(exp, 4); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   } else {
-    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp.stepWhite, got.octave); }
+    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
     else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   }
 }
 
-function onCorrect(stepWhite, octave){
+function onCorrect(expectedNote, octave){
   // Start timer on first note press
   if(!state.timerStarted) {
     startTimer();
     state.timerStarted = true;
   }
   
-  // Play audio tone if enabled
-  playNoteTone(stepWhite, octave);
+  // Play the original MIDI note sound (preserving sharps/flats) instead of the simplified stepWhite
+  playNoteTone(expectedNote.step, expectedNote.octave);
   
   state.idx++; 
   
@@ -1291,8 +1293,8 @@ async function onFile(e){
 
 function postProcessSequence(seq){
   if(state.difficulty==='easy'){ return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave:4})); }
-  // strict: keep octave (clamp 1..7)
-  return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4))}));
+  // strict: keep sharps/flats and octave (clamp 1..7)
+  return seq.map(n=>({step:n.step, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4))}));
 }
 
 async function parseMIDIBuffer(buf){
@@ -1334,48 +1336,11 @@ async function parseMIDIBuffer(buf){
     const sortedNotes = allNotes.sort((a, b) => a.time - b.time);
     const convertedNotes = sortedNotes.map(note => fromMidi(note.note));
     
-    // For built-in songs, the MIDI files often contain the complete song with multiple verses
-    // but the game only expects the first verse/line. Check if we have a reasonable
-    // truncation point by looking for the expected pattern length.
-    function truncateToFirstPattern(notes) {
-      // For most children's songs, the first verse is typically 12-16 notes
-      // Look for a natural break point where the pattern might repeat or change
-      
-      if (notes.length <= 16) return notes; // Already short enough
-      
-      // Try common song lengths for children's songs
-      const commonLengths = [14, 12, 16, 13, 15];
-      
-      for (const length of commonLengths) {
-        if (length < notes.length) {
-          // Check if truncating here makes sense by seeing if the next part
-          // starts to repeat or significantly differ
-          const firstPart = notes.slice(0, length);
-          const nextPart = notes.slice(length, length + Math.min(4, notes.length - length));
-          
-          // If we have a reasonable first part and the next part starts differently,
-          // this might be a good truncation point
-          if (firstPart.length === length && nextPart.length >= 2) {
-            // If the pattern changes significantly, this is likely a good break point
-            if (!nextPart.slice(0, 2).every((note, idx) => {
-              const endIdx = firstPart.length - 2 + idx;
-              return endIdx >= 0 && endIdx < firstPart.length && 
-                     firstPart[endIdx].step === note.step && 
-                     firstPart[endIdx].octave === note.octave;
-            })) {
-              console.log(`Truncating MIDI sequence at ${length} notes (detected verse break)`);
-              return firstPart;
-            }
-          }
-        }
-      }
-      
-      return notes; // No good truncation point found
-    }
+    // Load the full MIDI file without truncation
+    // Users want all notes from the MIDI files to be available
+    console.log(`Loaded ${convertedNotes.length} notes from MIDI file without truncation`);
     
-    const truncatedNotes = truncateToFirstPattern(convertedNotes);
-    
-    return truncatedNotes;
+    return convertedNotes;
     
   } catch (error) {
     console.error('MIDI parsing error:', error);

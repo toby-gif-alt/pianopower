@@ -1078,7 +1078,7 @@ function initAudioContext() {
   return audioContext;
 }
 
-function playNoteTone(stepWhite, octave) {
+function playNoteTone(step, octave) {
   if (!state.audioEnabled) return;
   
   const ctx = initAudioContext();
@@ -1089,18 +1089,20 @@ function playNoteTone(stepWhite, octave) {
     ctx.resume();
   }
   
-  // Calculate frequency for the note
-  const noteFrequencies = {
-    'C': 261.63, 'D': 293.66, 'E': 329.63, 'F': 349.23,
-    'G': 392.00, 'A': 440.00, 'B': 493.88
+  // Calculate frequency for any note including sharps/flats
+  // Using A4 = 440Hz as reference and equal temperament
+  const noteToSemitone = {
+    'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+    'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
   };
   
-  let frequency = noteFrequencies[stepWhite];
-  if (!frequency) return;
+  const semitone = noteToSemitone[step];
+  if (semitone === undefined) return;
   
-  // Adjust for octave (4 is the base octave)
-  const octaveMultiplier = Math.pow(2, octave - 4);
-  frequency *= octaveMultiplier;
+  // Calculate frequency using A4 = 440Hz as reference
+  // Formula: f = 440 * 2^((n-69)/12) where n is MIDI note number
+  const midiNote = (octave + 1) * 12 + semitone;
+  const frequency = 440 * Math.pow(2, (midiNote - 69) / 12);
   
   // Create oscillator for the tone
   const oscillator = ctx.createOscillator();
@@ -1127,24 +1129,24 @@ function handleIncomingMidi(midi){
   const exp = state.expected(); if(!exp) return;
   const got = fromMidi(midi);
   if(state.difficulty==='easy'){
-    if(got.stepWhite===exp.stepWhite){ onCorrect(exp.stepWhite, 4); }
+    if(got.stepWhite===exp.stepWhite){ onCorrect(exp, 4); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   } else {
-    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp.stepWhite, got.octave); }
+    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
     else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   }
 }
 
-function onCorrect(stepWhite, octave){
+function onCorrect(expectedNote, octave){
   // Start timer on first note press
   if(!state.timerStarted) {
     startTimer();
     state.timerStarted = true;
   }
   
-  // Play audio tone if enabled
-  playNoteTone(stepWhite, octave);
+  // Play the original MIDI note sound (preserving sharps/flats) instead of the simplified stepWhite
+  playNoteTone(expectedNote.step, expectedNote.octave);
   
   state.idx++; 
   

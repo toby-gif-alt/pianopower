@@ -1291,8 +1291,8 @@ async function onFile(e){
 
 function postProcessSequence(seq){
   if(state.difficulty==='easy'){ return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave:4})); }
-  // strict: keep octave (clamp 1..7)
-  return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4))}));
+  // strict: keep sharps/flats and octave (clamp 1..7)
+  return seq.map(n=>({step:n.step, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4))}));
 }
 
 async function parseMIDIBuffer(buf){

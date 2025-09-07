@@ -1146,7 +1146,7 @@ function onCorrect(expectedNote, octave){
   }
   
   // Play the original MIDI note sound (preserving sharps/flats) instead of the simplified stepWhite
-  playNoteTone(expectedNote.step, expectedNote.octave);
+  playNoteTone(expectedNote.originalStep || expectedNote.step, expectedNote.octave);
   
   state.idx++; 
   
@@ -1292,7 +1292,14 @@ async function onFile(e){
 }
 
 function postProcessSequence(seq){
-  if(state.difficulty==='easy'){ return seq.map(n=>({step:n.stepWhite, stepWhite:n.stepWhite, octave:4})); }
+  if(state.difficulty==='easy'){ 
+    return seq.map(n=>({
+      step:n.stepWhite, 
+      stepWhite:n.stepWhite, 
+      originalStep:n.step,  // Preserve original note for sound playback
+      octave:4
+    })); 
+  }
   // strict: keep sharps/flats and octave (clamp 1..7)
   return seq.map(n=>({step:n.step, stepWhite:n.stepWhite, octave: Math.min(7, Math.max(1, n.octave||4))}));
 }

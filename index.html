@@ -749,7 +749,15 @@ function startGame(){
   reset();
   swap(songSelection, play);
   // Timer will start when first note is pressed
-  if(state.mode==='mic') startMic(); else startMIDI();
+  if(state.mode==='mic') {
+    startMic();
+  } else {
+    startMIDI();
+    // Ensure audio is enabled for MIDI mode for better user experience
+    if (!state.audioEnabled) {
+      pick('audioEnabled', true, ['audioOn','audioOff'], {target: el('audioOn')});
+    }
+  }
   // Removed guide auto-play functionality
 }
 
@@ -1043,10 +1051,33 @@ async function startMic(){
     const stream = await navigator.mediaDevices.getUserMedia({audio:true});
     const ctx = new (window.AudioContext||window.webkitAudioContext)();
     const src = ctx.createMediaStreamSource(stream);
-    const analyser = ctx.createAnalyser(); analyser.fftSize=2048; src.connect(analyser);
+    const analyser = ctx.createAnalyser(); 
+    analyser.fftSize = 4096; // Increased for better frequency resolution
+    analyser.smoothingTimeConstant = 0.8; // Smoothing for stability
+    src.connect(analyser);
     const buf = new Float32Array(analyser.fftSize);
-    let running=true;
-    const loop=()=>{ if(!running) return; analyser.getFloatTimeDomainData(buf); const f=autoCorrelate(buf, ctx.sampleRate); if(f>0){ const midi=Math.round(69+12*Math.log2(f/440)); handleIncomingMidi(midi,true); } requestAnimationFrame(loop); };
+    let running = true;
+    let lastMicNoteTime = 0;
+    const MIC_DEBOUNCE_MS = 150; // Shorter debounce for microphone to feel responsive
+    
+    const loop = () => {
+      if(!running) return;
+      analyser.getFloatTimeDomainData(buf);
+      const f = autoCorrelate(buf, ctx.sampleRate);
+      if(f > 0) {
+        const now = Date.now();
+        // Additional debouncing specifically for microphone input
+        if (now - lastMicNoteTime >= MIC_DEBOUNCE_MS) {
+          const midi = Math.round(69 + 12 * Math.log2(f / 440));
+          // Only process notes in reasonable piano range
+          if (midi >= 21 && midi <= 108) {
+            handleIncomingMidi(midi, true);
+            lastMicNoteTime = now;
+          }
+        }
+      }
+      requestAnimationFrame(loop);
+    };
     loop();
     stopMicFn=()=>{ running=false; stream.getTracks().forEach(t=>t.stop()); ctx.close(); };
   }catch(e){ 
@@ -1058,14 +1089,38 @@ function stopMic(){ if(stopMicFn){ stopMicFn(); stopMicFn=null; } }
 function stopInputs(){ stopMIDI(); stopMic(); }
 
 function autoCorrelate(buf, sr){
-  let sum=0; for(let i=0;i<buf.length;i++) sum+=buf[i]*buf[i];
-  const rms=Math.sqrt(sum/buf.length); if(rms<0.01) return -1;
-  const SIZE=buf.length; const MAX=Math.floor(SIZE/2); let best=-1, bestCorr=0, last=1;
-  for(let off=2; off<MAX; off++){
-    let corr=0; for(let i=0;i<MAX;i++) corr += Math.abs(buf[i]-buf[i+off]);
-    corr = 1 - corr / MAX; if(corr>0.9 && corr>last){ bestCorr=corr; best=off; } last=corr;
+  // Improved autocorrelation for better pitch detection stability
+  let sum = 0;
+  for(let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+  const rms = Math.sqrt(sum / buf.length);
+  
+  // Increased threshold for better noise rejection
+  if(rms < 0.02) return -1;
+  
+  const SIZE = buf.length;
+  const MAX = Math.floor(SIZE / 2);
+  let best = -1, bestCorr = 0;
+  let last = 1;
+  
+  // Look for correlation peaks
+  for(let off = 2; off < MAX; off++) {
+    let corr = 0;
+    for(let i = 0; i < MAX; i++) {
+      corr += Math.abs(buf[i] - buf[i + off]);
+    }
+    corr = 1 - corr / MAX;
+    
+    // Improved threshold and peak detection
+    if(corr > 0.92 && corr > last) {
+      bestCorr = corr;
+      best = off;
+    }
+    last = corr;
   }
-  if(bestCorr>0.01) return sr/best; return -1;
+  
+  // Return frequency only if correlation is strong enough
+  if(bestCorr > 0.92) return sr / best;
+  return -1;
 }
 
 // ----- Simple Audio Tone System -----
@@ -1125,8 +1180,19 @@ function playNoteTone(step, octave) {
 }
 
 // ----- Correctness Logic -----
-function handleIncomingMidi(midi){
+let lastNoteTime = 0;
+const NOTE_DEBOUNCE_MS = 250; // Minimum time between notes to prevent accidental double notes
+
+function handleIncomingMidi(midi, fromMicrophone = false){
   const exp = state.expected(); if(!exp) return;
+  
+  // Debouncing to prevent accidental double notes
+  const now = Date.now();
+  if (now - lastNoteTime < NOTE_DEBOUNCE_MS) {
+    return; // Ignore this note - too soon after the last one
+  }
+  lastNoteTime = now;
+  
   const got = fromMidi(midi);
   if(state.difficulty==='easy'){
     if(got.stepWhite===exp.stepWhite){ onCorrect(exp, 4); }
@@ -1484,8 +1550,13 @@ async function autoDetectMIDI() {
       const midiAccess = await navigator.requestMIDIAccess();
       if (midiAccess.inputs.size > 0) {
         console.log('MIDI device detected, auto-switching to MIDI mode');
-        // Switch to MIDI mode
-        pick('mode', 'midi', ['modeMic','modeMIDI']);
+        // Switch to MIDI mode and highlight the button
+        pick('mode', 'midi', ['modeMic','modeMIDI'], {target: el('modeMIDI')});
+        
+        // Automatically turn on sound when MIDI is detected
+        pick('audioEnabled', true, ['audioOn','audioOff'], {target: el('audioOn')});
+        
+        console.log('MIDI mode activated with sound enabled');
       } else {
         console.log('No MIDI devices found');
       }

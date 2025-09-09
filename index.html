@@ -132,10 +132,14 @@
       background-repeat: no-repeat;
     }
     .scene.mary-background {
-      background-image: url('images/mary background.png');
+      background-image: url('mary background.png');
+      background-position: center center; /* Move background down to show grass */
     }
     .scene.twinkle-background {
       background-image: url('images/twinkle background.png');
+    }
+    .scene.letitgo-background {
+      background-image: url('letitgo_background.png');
     }
     /* For uploaded songs: smaller scene, bigger keyboard */
     .uploaded-layout .scene {
@@ -149,7 +153,7 @@
       min-width: 50px; /* Increased from 44px */
     }
     /* Characters have higher z-index */
-    .star, .lamb, .mary { z-index: 10; }
+    .star, .lamb, .mary, .elsa { z-index: 10; }
     .star { 
       position:absolute; 
       left:50%; 
@@ -191,6 +195,18 @@
       right: 20px;
       width: 192px; /* Made 3X larger (was 64px) */
       height: 192px;
+      z-index: 10;
+      image-rendering: pixelated; /* Keep pixel art crisp */
+    }
+    
+    /* Elsa character for Let it Go song */
+    .elsa {
+      position: absolute;
+      bottom: 30px; /* Position on snow ground */
+      left: 0;
+      width: 64px;
+      height: 64px;
+      transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
       z-index: 10;
       image-rendering: pixelated; /* Keep pixel art crisp */
     }
@@ -423,13 +439,11 @@
         <div class="row" style="justify-content: space-between; align-items: center;">
           <div>
             <span style="font-weight: 600; margin-right: 12px;">Input:</span>
-            <button class="pill active" id="modeMic">🎤 Microphone</button>
-            <button class="pill" id="modeMIDI">🎹 MIDI Keyboard</button>
+            <button class="pill active" id="modeMIDI">🎹 MIDI Keyboard</button>
           </div>
           <div>
             <span style="font-weight: 600; margin-right: 12px;">Audio:</span>
-            <button class="pill" id="audioOn">🔊 On</button>
-            <button class="pill active" id="audioOff">🔇 Off</button>
+            <button class="pill active" id="audioOn">🔊 On</button>
           </div>
           <div>
             <span style="font-weight: 600; margin-right: 12px;">Difficulty:</span>
@@ -465,6 +479,14 @@
           </button>
         </div>
         
+        <!-- Harder versions -->
+        <h3 style="margin: 32px 0 16px 0; color: #7c3aed;">❄️ Harder Versions</h3>
+        <div class="song-grid">
+          <button class="big-btn" id="chooseLetItGo" style="background: #7c3aed; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);">
+            ❄️ Let it Go
+          </button>
+        </div>
+        
         <div style="margin-top: 32px;">
           <h3>Or upload your own MIDI file:</h3>
           <input type="file" id="file" accept=".mid,.midi" style="margin: 16px 0;" />
@@ -493,10 +515,12 @@
         <img class="star-effect" id="starEffect" src="images/stareffect.png" style="display: none;" />
         
         <!-- Lamb for Mary Had a Little Lamb (now using PNG sprite) -->
-        <img class="lamb" id="lamb" src="images/sheep.png" style="display: none;" />
+        <img class="lamb" id="lamb" src="sheep.png" style="display: none;" />
         
-        <!-- Mary character at the end (now using PNG) -->
-        <img class="mary" id="mary" src="images/mary.png" style="display: none;" />
+        <!-- Elsa character for Let it Go song -->
+        <img class="elsa" id="elsa" src="elsa.png" style="display: none;" />
+        
+        <!-- Mary character removed - now part of background -->
       </div>
 
       <div class="timeline" id="timeline"></div>
@@ -569,6 +593,11 @@ const SONGS = {
     notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4'],
     midiFile: 'midi/mary-had-a-little-lamb.mid'
   },
+  letitgo: {
+    title: 'Let it Go',
+    notes: ['F4','G4','A4','Bb4','C5','D5','Eb5','F5'], // Placeholder notes
+    midiFile: 'midi/letitgo.mid'
+  },
   twinkleEasy: {
     title: 'Twinkle Twinkle Little Star (Easy)',
     notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4'],
@@ -583,9 +612,9 @@ const SONGS = {
 
 // State (session only)
 let state = {
-  mode: 'mic',            // 'mic' | 'midi'
+  mode: 'midi',           // Force MIDI mode
   difficulty: 'easy',     // 'easy' | 'strict'
-  audioEnabled: false,    // Audio on/off toggle
+  audioEnabled: true,     // Force audio on at max
   name: '',
   queue: SONGS.twinkle.notes.map(toObj), // default
   idx: 0,
@@ -627,6 +656,7 @@ const timeline = el('timeline');
 const star = el('star');
 const lamb = el('lamb');
 const mary = el('mary');
+const elsa = el('elsa');
 const timeLbl = el('time');
 const bestLbl = el('best');
 const lastLbl = el('last');
@@ -636,13 +666,11 @@ const completionTimeDisplay = el('completionTimeDisplay');
 const tryAgainBtn = el('tryAgainBtn');
 const backToMenuBtn = el('backToMenuBtn');
 
-// Controls wiring - Updated for new page flow
-el('modeMic').onclick = (e)=>{ pick('mode','mic',['modeMic','modeMIDI'],e)};
-el('modeMIDI').onclick = (e)=>{ pick('mode','midi',['modeMic','modeMIDI'],e)};
+// Controls wiring - Updated for new page flow (MIDI only mode)
+el('modeMIDI').onclick = (e)=>{ pick('mode','midi',['modeMIDI'],e)};
 el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','strictMode'],e)};
 el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','strictMode'],e)};
-el('audioOn').onclick = (e)=>{ pick('audioEnabled',true,['audioOn','audioOff'],e)};
-el('audioOff').onclick = (e)=>{ pick('audioEnabled',false,['audioOn','audioOff'],e)};
+el('audioOn').onclick = (e)=>{ pick('audioEnabled',true,['audioOn'],e)};
 
 // New page navigation
 el('nextToSongs').onclick = ()=>{ 
@@ -652,6 +680,7 @@ el('nextToSongs').onclick = ()=>{
 el('backToWelcome').onclick = ()=>{ swap(songSelection, welcome); };
 el('chooseTwinkle').onclick = ()=>{ startGameWithSong('twinkle'); };
 el('chooseMary').onclick = ()=>{ startGameWithSong('mary'); };
+el('chooseLetItGo').onclick = ()=>{ startGameWithSong('letitgo'); };
 el('chooseTwinkleEasy').onclick = ()=>{ startGameWithSong('twinkleEasy'); };
 el('chooseMaryEasy').onclick = ()=>{ startGameWithSong('maryEasy'); };
 el('startWithUpload').onclick = ()=>{ 
@@ -745,19 +774,12 @@ async function loadBuiltInMIDI(midiPath, songKey) {
 
 function startGame(){
   if(!state.name) state.name = el('name').value.trim();
-  modeLbl.textContent = state.mode==='mic'?'Microphone':'MIDI';
+  modeLbl.textContent = 'MIDI';
   reset();
   swap(songSelection, play);
   // Timer will start when first note is pressed
-  if(state.mode==='mic') {
-    startMic();
-  } else {
-    startMIDI();
-    // Ensure audio is enabled for MIDI mode for better user experience
-    if (!state.audioEnabled) {
-      pick('audioEnabled', true, ['audioOn','audioOff'], {target: el('audioOn')});
-    }
-  }
+  // Always use MIDI mode with audio enabled
+  startMIDI();
   // Removed guide auto-play functionality
 }
 
@@ -872,9 +894,10 @@ function renderKeyboard(active){
   }
 }
 
-// ----- Enhanced Animation System (Star for other songs, Lamb for Mary) -----
+// ----- Enhanced Animation System (Star for other songs, Lamb for Mary, Elsa for Let it Go) -----
 function placeStar(){
   const isMarySong = state.songKey === 'mary' || state.songKey === 'maryEasy';
+  const isLetItGoSong = state.songKey === 'letitgo';
   const isUploadedSong = state.songKey === 'uploaded';
   const scene = document.getElementById('scene');
   const playSection = document.getElementById('play');
@@ -893,22 +916,31 @@ function placeStar(){
     // This will show no background image, making piano more prominent
   } else if(isMarySong) {
     scene.classList.add('mary-background');
+  } else if(isLetItGoSong) {
+    scene.classList.add('letitgo-background');
   } else {
     scene.classList.add('twinkle-background');
   }
   
   if(isMarySong) {
-    // Show lamb and Mary, hide star and star effect
+    // Show lamb, hide star and star effect (Mary now part of background)
     star.style.display = 'none';
     document.getElementById('starEffect').style.display = 'none';
     lamb.style.display = 'block';
-    mary.style.display = 'block';
+    elsa.style.display = 'none';
     placeLamb();
+  } else if(isLetItGoSong) {
+    // Show Elsa, hide other characters
+    star.style.display = 'none';
+    document.getElementById('starEffect').style.display = 'none';
+    lamb.style.display = 'none';
+    elsa.style.display = 'block';
+    placeElsa();
   } else {
-    // Show star, hide lamb and Mary
+    // Show star, hide other characters
     star.style.display = 'block';
     lamb.style.display = 'none';
-    mary.style.display = 'none';
+    elsa.style.display = 'none';
     placeStarForTwinkle();
   }
 }
@@ -967,21 +999,51 @@ function placeLamb(){
   const total = state.queue.length || 1;
   const progress = Math.min(state.idx/total,1);
   
-  // Move lamb from left (0px) to right, leaving more space for larger Mary
-  lamb.style.left = `calc(${progress * 100}% * 0.65)`; // Reduced from 0.8 to 0.65 to leave space for larger Mary
+  // Move lamb across the scene (Mary is now part of background)
+  lamb.style.left = `calc(${progress * 100}% * 0.8)`; // Can use more space now
   
   // Remove jumping class to reset animation
   lamb.classList.remove('jumping');
+  lamb.src = 'sheep.png'; // Reset to normal sheep
   
   // Add jumping animation when moving to next note (but not on first note)
   if(state.idx > 0 && state.idx < state.queue.length) {
-    setTimeout(() => lamb.classList.add('jumping'), 50);
-    setTimeout(() => lamb.classList.remove('jumping'), 650);
+    setTimeout(() => {
+      lamb.classList.add('jumping');
+      lamb.src = 'sheepjump.png'; // Change to jumping sheep
+    }, 50);
+    setTimeout(() => {
+      lamb.classList.remove('jumping');
+      lamb.src = 'sheep.png'; // Back to normal sheep
+    }, 650);
   }
   
-  // When finished, lamb reaches Mary (adjusted for larger Mary)
+  // When finished, lamb reaches right side
   if(state.finished){ 
-    lamb.style.left = 'calc(100% - 240px)'; // Position next to larger Mary (was 140px)
+    lamb.style.left = 'calc(100% - 80px)'; // Position at right side
+  }
+}
+
+function placeElsa(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Move Elsa across the snowy scene, building her ice fortress
+  elsa.style.left = `calc(${progress * 100}% * 0.7)`; // Move across scene
+  
+  // Add some sparkle effects when notes are played
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    // Add a simple glow effect
+    elsa.style.filter = 'drop-shadow(0 0 10px #87CEEB)';
+    setTimeout(() => {
+      elsa.style.filter = 'none';
+    }, 500);
+  }
+  
+  // When finished, Elsa reaches her ice castle
+  if(state.finished){ 
+    elsa.style.left = 'calc(100% - 100px)'; // Position at ice fortress
+    elsa.style.filter = 'drop-shadow(0 0 15px #87CEEB)'; // Final magical glow
   }
 }
 
@@ -1253,13 +1315,20 @@ function showCompletionPopup() {
 }
 
 function getSongTargetTime(songKey) {
-  // Target times for built-in songs (in seconds)
-  const targets = {
-    'twinkle': 25,
-    'mary': 25,
-    'uploaded': 10 // Default for uploaded songs
-  };
-  return targets[songKey] || 10;
+  // New speed goal: every 2 notes = 1 second, round up for odd numbers
+  const song = SONGS[songKey];
+  if (song && song.notes) {
+    const noteCount = song.notes.length;
+    return Math.ceil(noteCount / 2); // Round up for odd numbers
+  }
+  
+  // Fallback for uploaded songs - use note count from current queue
+  if (songKey === 'uploaded' && state.queue) {
+    const noteCount = state.queue.length;
+    return Math.ceil(noteCount / 2);
+  }
+  
+  return 10; // Default fallback
 }
 
 function updateComparisonGraph(userTime, targetTime) {
@@ -1542,30 +1611,27 @@ function parseTrack(view, startOffset, trackLength) {
 
 // MusicXML parsing removed - MIDI only now
 
-// Auto-detect MIDI devices and switch mode if available
+// Auto-detect MIDI devices and ensure MIDI mode
 async function autoDetectMIDI() {
   try {
     if (navigator.requestMIDIAccess) {
       console.log('Checking for MIDI devices...');
       const midiAccess = await navigator.requestMIDIAccess();
       if (midiAccess.inputs.size > 0) {
-        console.log('MIDI device detected, auto-switching to MIDI mode');
-        // Switch to MIDI mode and highlight the button
-        pick('mode', 'midi', ['modeMic','modeMIDI'], {target: el('modeMIDI')});
-        
-        // Automatically turn on sound when MIDI is detected
-        pick('audioEnabled', true, ['audioOn','audioOff'], {target: el('audioOn')});
-        
+        console.log('MIDI device detected');
+        // Ensure MIDI mode and audio are enabled
+        pick('mode', 'midi', ['modeMIDI'], {target: el('modeMIDI')});
+        pick('audioEnabled', true, ['audioOn'], {target: el('audioOn')});
         console.log('MIDI mode activated with sound enabled');
       } else {
-        console.log('No MIDI devices found');
+        console.log('No MIDI devices found, but MIDI mode still available');
       }
     } else {
       console.log('Web MIDI API not supported in this browser');
     }
   } catch (error) {
-    console.log('MIDI auto-detection failed:', error);
-    // Keep default microphone mode
+    console.log('MIDI initialization:', error);
+    // Keep MIDI mode as default
   }
 }
 

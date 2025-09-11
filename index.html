@@ -141,6 +141,29 @@
     .scene.letitgo-background {
       background-image: url('letitgo_background.png');
     }
+    
+    /* New song backgrounds */
+    .scene.oldmacdonald-background {
+      background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 70%, #228B22 100%);
+    }
+    .scene.wheelsonbus-background {
+      background: linear-gradient(to bottom, #87CEEB 0%, #C0C0C0 70%, #696969 100%);
+    }
+    .scene.babyshark-background {
+      background: linear-gradient(to bottom, #00BFFF 0%, #1E90FF 50%, #0000CD 100%);
+    }
+    .scene.humptydumpty-background {
+      background: linear-gradient(to bottom, #87CEEB 0%, #F0E68C 70%, #32CD32 100%);
+    }
+    .scene.baablacksheep-background {
+      background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 70%, #228B22 100%);
+    }
+    .scene.itsyspider-background {
+      background: linear-gradient(to bottom, #87CEEB 0%, #DDD 50%, #8B4513 100%);
+    }
+    .scene.rowboat-background {
+      background: linear-gradient(to bottom, #87CEEB 0%, #4682B4 50%, #191970 100%);
+    }
     /* For uploaded songs: smaller scene, bigger keyboard */
     .uploaded-layout .scene {
       height: 120px; /* Reduced from 240px */
@@ -153,7 +176,7 @@
       min-width: 50px; /* Increased from 44px */
     }
     /* Characters have higher z-index */
-    .star, .lamb, .mary, .elsa { z-index: 10; }
+    .star, .lamb, .mary, .elsa, .farmer, .bus, .shark, .humpty, .blacksheep, .spider, .boat { z-index: 10; }
     .star { 
       position:absolute; 
       left:50%; 
@@ -175,17 +198,167 @@
       top: -20px; /* Position at top of scene */
     }
     
-    /* Lamb animation for Mary's song - PNG sprite */
+    /* Custom lamb animation for Mary's song - using CSS animation instead of PNG sprite */
     .lamb {
       position: absolute;
       bottom: 0px;
       left: 0;
-      width: 48px; /* Made 1/2X smaller (was 96px) */
+      width: 48px;
       height: 48px;
       transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
       z-index: 10;
-      object-fit: none;
-      object-position: 0 0; /* Start with the leftmost frame (proper sheep) */
+      background: #FFF;
+      border-radius: 50%;
+      border: 2px solid #333;
+    }
+    
+    .lamb::before {
+      content: '🐑';
+      position: absolute;
+      font-size: 32px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    /* New character animations */
+    .farmer {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      width: 60px;
+      height: 40px;
+      transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
+      z-index: 10;
+      background: #8B4513;
+      border-radius: 8px;
+    }
+    
+    .farmer::before {
+      content: '🚜';
+      position: absolute;
+      font-size: 32px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .bus {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 80px;
+      height: 50px;
+      transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
+      z-index: 10;
+      background: #FFD700;
+      border-radius: 12px;
+      border: 2px solid #333;
+    }
+    
+    .bus::before {
+      content: '🚌';
+      position: absolute;
+      font-size: 40px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .shark {
+      position: absolute;
+      bottom: 60px;
+      left: 0;
+      width: 60px;
+      height: 40px;
+      transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
+      z-index: 10;
+    }
+    
+    .shark::before {
+      content: '🦈';
+      position: absolute;
+      font-size: 36px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .humpty {
+      position: absolute;
+      bottom: 80px;
+      left: 20px;
+      width: 50px;
+      height: 60px;
+      transition: all 0.6s cubic-bezier(.68,-0.55,.265,1.55);
+      z-index: 10;
+    }
+    
+    .humpty::before {
+      content: '🥚';
+      position: absolute;
+      font-size: 40px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .blacksheep {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      width: 50px;
+      height: 50px;
+      transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
+      z-index: 10;
+    }
+    
+    .blacksheep::before {
+      content: '🐑';
+      position: absolute;
+      font-size: 36px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      filter: brightness(0.3);
+    }
+    
+    .spider {
+      position: absolute;
+      bottom: 0px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      transition: all 0.6s cubic-bezier(.68,-0.55,.265,1.55);
+      z-index: 10;
+    }
+    
+    .spider::before {
+      content: '🕷️';
+      position: absolute;
+      font-size: 28px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .boat {
+      position: absolute;
+      bottom: 40px;
+      left: 0;
+      width: 60px;
+      height: 40px;
+      transition: left 0.6s cubic-bezier(.68,-0.55,.265,1.55);
+      z-index: 10;
+    }
+    
+    .boat::before {
+      content: '🚣';
+      position: absolute;
+      font-size: 32px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
     
     /* Mary character at the end - PNG image */
@@ -210,40 +383,6 @@
       z-index: 10;
       image-rendering: pixelated; /* Keep pixel art crisp */
     }
-    
-    /* Lamb jumping animation with sprite cycling */
-    @keyframes lambJump {
-      0% { 
-        transform: translateY(0px) scale(1); 
-        object-position: 0 0; /* Resting state (leftmost frame) */
-      }
-      15% { 
-        transform: translateY(-15px) scale(1.05); 
-        object-position: -256px 0; /* Jump frame 1 */
-      }
-      30% { 
-        transform: translateY(-20px) scale(1.1); 
-        object-position: -512px 0; /* Jump frame 2 */
-      }
-      45% { 
-        transform: translateY(-15px) scale(1.05); 
-        object-position: -768px 0; /* Jump frame 3 */
-      }
-      60% { 
-        transform: translateY(0px) scale(1); 
-        object-position: -512px 0; /* Jump frame 2 */
-      }
-      75% { 
-        transform: translateY(0px) scale(1); 
-        object-position: -256px 0; /* Jump frame 1 */
-      }
-      100% { 
-        transform: translateY(0px) scale(1); 
-        object-position: 0 0; /* Back to resting state */
-      }
-    }
-    
-    .lamb.jumping { animation: lambJump 0.8s cubic-bezier(.68,-0.55,.265,1.55); }
     
     /* Enhanced platform jumping animation */
     @keyframes starJump {
@@ -466,6 +605,27 @@
           <button class="big-btn" id="chooseMaryEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
             🐑 Mary Had a Little Lamb (Easy)
           </button>
+          <button class="big-btn" id="chooseOldMacdonaldEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🚜 Old MacDonald (Easy)
+          </button>
+          <button class="big-btn" id="chooseWheelsOnBusEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🚌 Wheels on the Bus (Easy)
+          </button>
+          <button class="big-btn" id="chooseBabySharkEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🦈 Baby Shark (Easy)
+          </button>
+          <button class="big-btn" id="chooseHumptyDumptyEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🥚 Humpty Dumpty (Easy)
+          </button>
+          <button class="big-btn" id="chooseBaaBlackSheepEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🐑 Baa Baa Black Sheep (Easy)
+          </button>
+          <button class="big-btn" id="chooseItsySpiderEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🕷️ Itsy Bitsy Spider (Easy)
+          </button>
+          <button class="big-btn" id="chooseRowBoatEasy" style="background: #22c55e; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);">
+            🚣 Row Your Boat (Easy)
+          </button>
         </div>
         
         <!-- Full versions -->
@@ -476,6 +636,27 @@
           </button>
           <button class="big-btn" id="chooseMary">
             🐑 Mary Had a Little Lamb  
+          </button>
+          <button class="big-btn" id="chooseOldMacdonald">
+            🚜 Old MacDonald Had a Farm
+          </button>
+          <button class="big-btn" id="chooseWheelsOnBus">
+            🚌 The Wheels on the Bus
+          </button>
+          <button class="big-btn" id="chooseBabyShark">
+            🦈 Baby Shark
+          </button>
+          <button class="big-btn" id="chooseHumptyDumpty">
+            🥚 Humpty Dumpty
+          </button>
+          <button class="big-btn" id="chooseBaaBlackSheep">
+            🐑 Baa Baa Black Sheep
+          </button>
+          <button class="big-btn" id="chooseItsySpider">
+            🕷️ Itsy Bitsy Spider
+          </button>
+          <button class="big-btn" id="chooseRowBoat">
+            🚣 Row Row Row Your Boat
           </button>
         </div>
         
@@ -514,13 +695,20 @@
         <!-- Star effect for Twinkle ending -->
         <img class="star-effect" id="starEffect" src="images/stareffect.png" style="display: none;" />
         
-        <!-- Lamb for Mary Had a Little Lamb (now using PNG sprite) -->
-        <img class="lamb" id="lamb" src="sheep.png" style="display: none;" />
+        <!-- Lamb for Mary Had a Little Lamb (now using CSS animation) -->
+        <div class="lamb" id="lamb" style="display: none;"></div>
         
         <!-- Elsa character for Let it Go song -->
         <img class="elsa" id="elsa" src="elsa.png" style="display: none;" />
         
-        <!-- Mary character removed - now part of background -->
+        <!-- New animated characters -->
+        <div class="farmer" id="farmer" style="display: none;"></div>
+        <div class="bus" id="bus" style="display: none;"></div>
+        <div class="shark" id="shark" style="display: none;"></div>
+        <div class="humpty" id="humpty" style="display: none;"></div>
+        <div class="blacksheep" id="blacksheep" style="display: none;"></div>
+        <div class="spider" id="spider" style="display: none;"></div>
+        <div class="boat" id="boat" style="display: none;"></div>
       </div>
 
       <div class="timeline" id="timeline"></div>
@@ -607,6 +795,70 @@ const SONGS = {
     title: 'Mary Had a Little Lamb (Easy)', 
     notes: ['E4','D4','C4','D4','E4','E4','E4','D4','D4','D4','E4','G4','G4'],
     // No midiFile - uses only hardcoded notes (fallback = normal version)
+  },
+  
+  // New Easy Songs
+  oldMacdonaldEasy: {
+    title: 'Old MacDonald Had a Farm (Easy)',
+    notes: ['C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4']
+  },
+  oldMacdonald: {
+    title: 'Old MacDonald Had a Farm',
+    notes: ['C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4','G4','G4','F4','F4','E4','E4','D4','G4','G4','F4','F4','E4','E4','D4','C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4']
+  },
+  
+  wheelsOnBusEasy: {
+    title: 'The Wheels on the Bus (Easy)',
+    notes: ['C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4']
+  },
+  wheelsOnBus: {
+    title: 'The Wheels on the Bus',
+    notes: ['C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4','G4','G4','F4','F4','E4','E4','D4','D4','G4','G4','F4','F4','E4','E4','D4','D4','C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4']
+  },
+  
+  babySharkEasy: {
+    title: 'Baby Shark (Easy)',
+    notes: ['C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4']
+  },
+  babyShark: {
+    title: 'Baby Shark',
+    notes: ['C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4','C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4','D4','E4','F4','G4','A4','A4','A4','A4','B4','A4','G4','F4','E4','D4']
+  },
+  
+  humptyDumptyEasy: {
+    title: 'Humpty Dumpty (Easy)',
+    notes: ['C4','D4','E4','C4','E4','D4','C4','D4','E4','F4','G4','G4']
+  },
+  humptyDumpty: {
+    title: 'Humpty Dumpty',
+    notes: ['C4','D4','E4','C4','E4','D4','C4','D4','E4','F4','G4','G4','G4','F4','E4','D4','C4','C4','G4','G4','F4','E4','D4','C4','D4','E4','F4','G4','A4','G4','F4','E4','D4','C4']
+  },
+  
+  baaBlackSheepEasy: {
+    title: 'Baa Baa Black Sheep (Easy)',
+    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+  },
+  baaBlackSheep: {
+    title: 'Baa Baa Black Sheep',
+    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4','G4','G4','F4','F4','E4','E4','D4','G4','G4','F4','F4','E4','E4','D4','C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+  },
+  
+  itsySpiderEasy: {
+    title: 'Itsy Bitsy Spider (Easy)',
+    notes: ['G4','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4']
+  },
+  itsySpider: {
+    title: 'Itsy Bitsy Spider',
+    notes: ['G4','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4','E4','E4','E4','F4','G4','G4','F4','E4','G4','C5','C5','G4','G4','G4','A4','B4','B4','A4','G4','B4','C5','C5','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4']
+  },
+  
+  rowBoatEasy: {
+    title: 'Row Row Row Your Boat (Easy)',
+    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','G4','G4']
+  },
+  rowBoat: {
+    title: 'Row Row Row Your Boat',
+    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4','G4','F4','E4','D4','C4']
   }
 };
 
@@ -657,6 +909,13 @@ const star = el('star');
 const lamb = el('lamb');
 const mary = el('mary');
 const elsa = el('elsa');
+const farmer = el('farmer');
+const bus = el('bus');
+const shark = el('shark');
+const humpty = el('humpty');
+const blacksheep = el('blacksheep');
+const spider = el('spider');
+const boat = el('boat');
 const timeLbl = el('time');
 const bestLbl = el('best');
 const lastLbl = el('last');
@@ -683,6 +942,24 @@ el('chooseMary').onclick = ()=>{ startGameWithSong('mary'); };
 el('chooseLetItGo').onclick = ()=>{ startGameWithSong('letitgo'); };
 el('chooseTwinkleEasy').onclick = ()=>{ startGameWithSong('twinkleEasy'); };
 el('chooseMaryEasy').onclick = ()=>{ startGameWithSong('maryEasy'); };
+
+// New Easy Song Handlers
+el('chooseOldMacdonaldEasy').onclick = ()=>{ startGameWithSong('oldMacdonaldEasy'); };
+el('chooseWheelsOnBusEasy').onclick = ()=>{ startGameWithSong('wheelsOnBusEasy'); };
+el('chooseBabySharkEasy').onclick = ()=>{ startGameWithSong('babySharkEasy'); };
+el('chooseHumptyDumptyEasy').onclick = ()=>{ startGameWithSong('humptyDumptyEasy'); };
+el('chooseBaaBlackSheepEasy').onclick = ()=>{ startGameWithSong('baaBlackSheepEasy'); };
+el('chooseItsySpiderEasy').onclick = ()=>{ startGameWithSong('itsySpiderEasy'); };
+el('chooseRowBoatEasy').onclick = ()=>{ startGameWithSong('rowBoatEasy'); };
+
+// New Full Song Handlers
+el('chooseOldMacdonald').onclick = ()=>{ startGameWithSong('oldMacdonald'); };
+el('chooseWheelsOnBus').onclick = ()=>{ startGameWithSong('wheelsOnBus'); };
+el('chooseBabyShark').onclick = ()=>{ startGameWithSong('babyShark'); };
+el('chooseHumptyDumpty').onclick = ()=>{ startGameWithSong('humptyDumpty'); };
+el('chooseBaaBlackSheep').onclick = ()=>{ startGameWithSong('baaBlackSheep'); };
+el('chooseItsySpider').onclick = ()=>{ startGameWithSong('itsySpider'); };
+el('chooseRowBoat').onclick = ()=>{ startGameWithSong('rowBoat'); };
 el('startWithUpload').onclick = ()=>{ 
   const file = el('file').files[0];
   if(file) {
@@ -811,7 +1088,21 @@ function buildKey(step, octave, active, isBlack = false){
   
   if(active && active.stepWhite === step.replace('#','') && (state.difficulty==='easy' || active.octave===octave)){
     if(isBlack) {
-      d.style.background = '#4b5563'; // Lighter black when active
+      // For black keys in strict mode, use a bright highlight color
+      if(state.difficulty === 'strict' && active.step.includes('#')) {
+        d.style.background = '#FF6B6B'; // Bright red for black key activation
+        d.style.border = '3px solid #FF0000';
+      } else {
+        d.style.background = '#4b5563'; // Lighter black when active
+      }
+    } else {
+      d.style.background = COLORS[step];
+    }
+  } else if(state.difficulty === 'strict' && active && active.step === step && active.octave === octave) {
+    // Exact match for strict mode including black keys
+    if(isBlack) {
+      d.style.background = '#FF6B6B'; // Bright red for expected black keys
+      d.style.border = '3px solid #FF0000';
     } else {
       d.style.background = COLORS[step];
     }
@@ -829,6 +1120,14 @@ function buildKey(step, octave, active, isBlack = false){
   const l = document.createElement('div'); 
   l.className='lbl'; 
   l.textContent = step+(state.difficulty==='strict'?octave:'');
+  
+  // Make black key labels more visible in strict mode
+  if(isBlack && state.difficulty === 'strict') {
+    l.style.color = '#fff';
+    l.style.fontWeight = 'bold';
+    l.style.textShadow = '1px 1px 2px rgba(0,0,0,0.8)';
+  }
+  
   d.appendChild(l);
   return d;
 }
@@ -894,11 +1193,21 @@ function renderKeyboard(active){
   }
 }
 
-// ----- Enhanced Animation System (Star for other songs, Lamb for Mary, Elsa for Let it Go) -----
+// ----- Enhanced Animation System (Star for other songs, Character animations for each song) -----
 function placeStar(){
   const isMarySong = state.songKey === 'mary' || state.songKey === 'maryEasy';
   const isLetItGoSong = state.songKey === 'letitgo';
   const isUploadedSong = state.songKey === 'uploaded';
+  
+  // New songs detection
+  const isOldMacdonaldSong = state.songKey === 'oldMacdonald' || state.songKey === 'oldMacdonaldEasy';
+  const isWheelsOnBusSong = state.songKey === 'wheelsOnBus' || state.songKey === 'wheelsOnBusEasy';
+  const isBabySharkSong = state.songKey === 'babyShark' || state.songKey === 'babySharkEasy';
+  const isHumptyDumptySong = state.songKey === 'humptyDumpty' || state.songKey === 'humptyDumptyEasy';
+  const isBaaBlackSheepSong = state.songKey === 'baaBlackSheep' || state.songKey === 'baaBlackSheepEasy';
+  const isItsySpiderSong = state.songKey === 'itsySpider' || state.songKey === 'itsySpiderEasy';
+  const isRowBoatSong = state.songKey === 'rowBoat' || state.songKey === 'rowBoatEasy';
+  
   const scene = document.getElementById('scene');
   const playSection = document.getElementById('play');
   
@@ -913,34 +1222,71 @@ function placeStar(){
   scene.className = 'scene';
   if (isUploadedSong) {
     // For uploaded songs, no background image - just basic scene
-    // This will show no background image, making piano more prominent
   } else if(isMarySong) {
     scene.classList.add('mary-background');
   } else if(isLetItGoSong) {
     scene.classList.add('letitgo-background');
+  } else if(isOldMacdonaldSong) {
+    scene.classList.add('oldmacdonald-background');
+  } else if(isWheelsOnBusSong) {
+    scene.classList.add('wheelsonbus-background');
+  } else if(isBabySharkSong) {
+    scene.classList.add('babyshark-background');
+  } else if(isHumptyDumptySong) {
+    scene.classList.add('humptydumpty-background');
+  } else if(isBaaBlackSheepSong) {
+    scene.classList.add('baablacksheep-background');
+  } else if(isItsySpiderSong) {
+    scene.classList.add('itsyspider-background');
+  } else if(isRowBoatSong) {
+    scene.classList.add('rowboat-background');
   } else {
     scene.classList.add('twinkle-background');
   }
   
+  // Hide all characters first
+  star.style.display = 'none';
+  document.getElementById('starEffect').style.display = 'none';
+  lamb.style.display = 'none';
+  elsa.style.display = 'none';
+  farmer.style.display = 'none';
+  bus.style.display = 'none';
+  shark.style.display = 'none';
+  humpty.style.display = 'none';
+  blacksheep.style.display = 'none';
+  spider.style.display = 'none';
+  boat.style.display = 'none';
+  
+  // Show appropriate character and animation
   if(isMarySong) {
-    // Show lamb, hide star and star effect (Mary now part of background)
-    star.style.display = 'none';
-    document.getElementById('starEffect').style.display = 'none';
     lamb.style.display = 'block';
-    elsa.style.display = 'none';
     placeLamb();
   } else if(isLetItGoSong) {
-    // Show Elsa, hide other characters
-    star.style.display = 'none';
-    document.getElementById('starEffect').style.display = 'none';
-    lamb.style.display = 'none';
     elsa.style.display = 'block';
     placeElsa();
+  } else if(isOldMacdonaldSong) {
+    farmer.style.display = 'block';
+    placeFarmer();
+  } else if(isWheelsOnBusSong) {
+    bus.style.display = 'block';
+    placeBus();
+  } else if(isBabySharkSong) {
+    shark.style.display = 'block';
+    placeShark();
+  } else if(isHumptyDumptySong) {
+    humpty.style.display = 'block';
+    placeHumpty();
+  } else if(isBaaBlackSheepSong) {
+    blacksheep.style.display = 'block';
+    placeBlackSheep();
+  } else if(isItsySpiderSong) {
+    spider.style.display = 'block';
+    placeSpider();
+  } else if(isRowBoatSong) {
+    boat.style.display = 'block';
+    placeBoat();
   } else {
-    // Show star, hide other characters
     star.style.display = 'block';
-    lamb.style.display = 'none';
-    elsa.style.display = 'none';
     placeStarForTwinkle();
   }
 }
@@ -1002,25 +1348,168 @@ function placeLamb(){
   // Move lamb across the scene (Mary is now part of background)
   lamb.style.left = `calc(${progress * 100}% * 0.8)`; // Can use more space now
   
-  // Remove jumping class to reset animation
-  lamb.classList.remove('jumping');
-  lamb.src = 'sheep.png'; // Reset to normal sheep
-  
   // Add jumping animation when moving to next note (but not on first note)
   if(state.idx > 0 && state.idx < state.queue.length) {
+    lamb.style.transform = 'scale(1.1) translateY(-10px)';
     setTimeout(() => {
-      lamb.classList.add('jumping');
-      lamb.src = 'sheepjump.png'; // Change to jumping sheep
-    }, 50);
-    setTimeout(() => {
-      lamb.classList.remove('jumping');
-      lamb.src = 'sheep.png'; // Back to normal sheep
-    }, 650);
+      lamb.style.transform = 'scale(1) translateY(0px)';
+    }, 300);
   }
   
   // When finished, lamb reaches right side
   if(state.finished){ 
     lamb.style.left = 'calc(100% - 80px)'; // Position at right side
+  }
+}
+
+function placeFarmer(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Move farmer with tractor across the farm
+  farmer.style.left = `calc(${progress * 100}% * 0.85)`;
+  
+  // Add bounce animation when moving to next note
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    farmer.style.transform = 'scale(1.1) translateY(-5px)';
+    setTimeout(() => {
+      farmer.style.transform = 'scale(1) translateY(0px)';
+    }, 300);
+  }
+  
+  if(state.finished){ 
+    farmer.style.left = 'calc(100% - 100px)';
+  }
+}
+
+function placeBus(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Move bus through the city
+  bus.style.left = `calc(${progress * 100}% * 0.8)`;
+  
+  // Add driving animation
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    bus.style.transform = 'scale(1.05) translateY(-3px)';
+    setTimeout(() => {
+      bus.style.transform = 'scale(1) translateY(0px)';
+    }, 400);
+  }
+  
+  if(state.finished){ 
+    bus.style.left = 'calc(100% - 120px)';
+  }
+}
+
+function placeShark(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Move shark through the ocean
+  shark.style.left = `calc(${progress * 100}% * 0.85)`;
+  
+  // Add swimming animation
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    shark.style.transform = 'translateY(-8px) rotate(5deg)';
+    setTimeout(() => {
+      shark.style.transform = 'translateY(0px) rotate(0deg)';
+    }, 400);
+  }
+  
+  if(state.finished){ 
+    shark.style.left = 'calc(100% - 100px)';
+  }
+}
+
+function placeHumpty(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Humpty sits on wall and falls at the end
+  if(state.finished) {
+    // Fall animation
+    humpty.style.bottom = '0px';
+    humpty.style.transform = 'rotate(90deg) scale(0.8)';
+  } else {
+    // Sitting on wall, slight wobble with each note
+    humpty.style.bottom = '80px';
+    if(state.idx > 0 && state.idx < state.queue.length) {
+      humpty.style.transform = 'rotate(5deg) scale(1.1)';
+      setTimeout(() => {
+        humpty.style.transform = 'rotate(0deg) scale(1)';
+      }, 300);
+    }
+  }
+}
+
+function placeBlackSheep(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Move black sheep across pastoral scene
+  blacksheep.style.left = `calc(${progress * 100}% * 0.8)`;
+  
+  // Add knitting animation (gentle bounce)
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    blacksheep.style.transform = 'scale(1.1) translateY(-5px)';
+    setTimeout(() => {
+      blacksheep.style.transform = 'scale(1) translateY(0px)';
+    }, 400);
+  }
+  
+  if(state.finished){ 
+    blacksheep.style.left = 'calc(100% - 90px)';
+  }
+}
+
+function placeSpider(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Spider climbs up the spout (moves up and right)
+  const verticalProgress = progress * 180; // Climb up 180px
+  const horizontalProgress = progress * 60; // Move right 60px
+  
+  spider.style.bottom = `${verticalProgress}px`;
+  spider.style.left = `${20 + horizontalProgress}px`;
+  
+  // Add climbing animation
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    spider.style.transform = 'scale(1.2) rotate(10deg)';
+    setTimeout(() => {
+      spider.style.transform = 'scale(1) rotate(0deg)';
+    }, 300);
+  }
+  
+  if(state.finished){ 
+    spider.style.bottom = '200px';
+    spider.style.left = '80px';
+  }
+}
+
+function placeBoat(){
+  const total = state.queue.length || 1;
+  const progress = Math.min(state.idx/total,1);
+  
+  // Move boat around the lake (circular motion)
+  const angle = progress * Math.PI * 2; // Full circle
+  const radius = 80;
+  const centerX = 120;
+  const centerY = 80;
+  
+  const x = centerX + Math.cos(angle) * radius;
+  const y = centerY + Math.sin(angle) * radius * 0.3; // Flatten the circle
+  
+  boat.style.left = `${Math.max(0, x)}px`;
+  boat.style.bottom = `${Math.max(20, y)}px`;
+  
+  // Add rowing animation
+  if(state.idx > 0 && state.idx < state.queue.length) {
+    boat.style.transform = 'scale(1.1) rotate(5deg)';
+    setTimeout(() => {
+      boat.style.transform = 'scale(1) rotate(0deg)';
+    }, 400);
   }
 }
 
@@ -1315,17 +1804,18 @@ function showCompletionPopup() {
 }
 
 function getSongTargetTime(songKey) {
-  // New speed goal: every 2 notes = 1 second, round up for odd numbers
+  // New speed goal: 3 notes per 2 seconds = 1.5 notes per second
+  // So time = notes / 1.5 = notes * 2/3
   const song = SONGS[songKey];
   if (song && song.notes) {
     const noteCount = song.notes.length;
-    return Math.ceil(noteCount / 2); // Round up for odd numbers
+    return Math.ceil(noteCount * 2 / 3); // 3 notes per 2 seconds
   }
   
   // Fallback for uploaded songs - use note count from current queue
   if (songKey === 'uploaded' && state.queue) {
     const noteCount = state.queue.length;
-    return Math.ceil(noteCount / 2);
+    return Math.ceil(noteCount * 2 / 3); // 3 notes per 2 seconds
   }
   
   return 10; // Default fallback

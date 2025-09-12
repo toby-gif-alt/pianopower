@@ -878,6 +878,7 @@ let state = {
   bestTimes: {},          // per-song best in this session
   lastTimes: {},          // per-song last in this session
   songKey: 'twinkle',
+  strictOctaveRange: [3, 5], // Current 3-octave range for strict mode [low, high]
   expected() { return this.queue[this.idx] || null; },
 };
 
@@ -999,6 +1000,10 @@ function swap(hide,show){ hide.classList.add('hidden'); show.classList.remove('h
 
 function reset(){
   state.idx=0; state.finished=false; state.startTime=null; state.elapsed=0; state.timerStarted=false;
+  
+  // Reset strict mode octave range to default when starting a new song
+  state.strictOctaveRange = [3, 5]; // Default 3-octave range
+  
   feedback.textContent = '';
   renderTimeline();
   renderKeyboard();
@@ -1196,20 +1201,40 @@ function renderKeyboard(active){
       kbd.appendChild(buildOctaveKeys(o, active));
     }
   } else {
-    // In strict mode, use MIDI device range if available, otherwise use song range
-    let [low, high] = songRange();
+    // Strict mode: adaptive 3-octave display that only updates when notes go outside current view
+    updateStrictOctaveRange(active);
+    const [low, high] = state.strictOctaveRange;
     
-    if (state.mode === 'midi') {
-      const [midiLow, midiHigh] = getMIDIDeviceOctaveRange();
-      // Use MIDI device range if it's been detected and is reasonable
-      if (midiHigh > midiLow && midiHigh - midiLow <= 7) {
-        low = midiLow;
-        high = midiHigh;
-      }
+    for(let o = low; o <= high; o++){ 
+      kbd.appendChild(buildOctaveKeys(o, active));
+    }
+  }
+}
+
+function updateStrictOctaveRange(expectedNote) {
+  if (!expectedNote) return;
+  
+  const [currentLow, currentHigh] = state.strictOctaveRange;
+  const targetOctave = expectedNote.octave;
+  
+  // Check if the target note is outside the current displayed range
+  if (targetOctave < currentLow || targetOctave > currentHigh) {
+    // Calculate new range centered around the target note
+    let newLow = targetOctave - 1; // Put target in middle octave
+    let newHigh = targetOctave + 1;
+    
+    // Clamp to valid octave range (1-7)
+    if (newLow < 1) {
+      newLow = 1;
+      newHigh = Math.min(7, newLow + 2);
+    } else if (newHigh > 7) {
+      newHigh = 7;
+      newLow = Math.max(1, newHigh - 2);
     }
     
-    for(let o = low; o<=high; o++){ 
-      kbd.appendChild(buildOctaveKeys(o, active));
+    // Update the range only if it actually changed
+    if (newLow !== currentLow || newHigh !== currentHigh) {
+      state.strictOctaveRange = [newLow, newHigh];
     }
   }
 }

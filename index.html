@@ -112,10 +112,10 @@
     .name-input:focus { border-color: var(--big-button); outline: none; }
     
     /* Existing game styles */
-    .kbd { user-select:none; position:relative; display:flex; gap:6px; padding:10px; border-radius:18px; border:1px solid #e5e7eb; background:#ffffffcf; box-shadow: inset 0 6px 14px rgba(0,0,0,.05); width: 100%; }
-    .white { position:relative; flex:1 1 0; height:120px; min-width:44px; border-radius:12px; background:#fff; border:1px solid #e5e7eb; box-shadow: inset 0 -2px 0 #e5e7eb; }
+    .kbd { user-select:none; position:relative; display:flex; gap:4px; padding:8px; border-radius:18px; border:1px solid #e5e7eb; background:#ffffffcf; box-shadow: inset 0 6px 14px rgba(0,0,0,.05); max-width: calc(100% - 16px); margin: 0 auto; }
+    .white { position:relative; flex:1 1 0; height:120px; min-width:40px; border-radius:12px; background:#fff; border:1px solid #e5e7eb; box-shadow: inset 0 -2px 0 #e5e7eb; }
     .white .lbl { position:absolute; bottom:6px; width:100%; text-align:center; font-size:12px; font-weight:700; }
-    .black { position:absolute; width:30px; height:70px; background:#1f2937; border:1px solid #111827; border-radius:0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index:2; }
+    .black { position:absolute; width:28px; height:70px; background:#1f2937; border:1px solid #111827; border-radius:0 0 8px 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index:2; }
     .black .lbl { position:absolute; bottom:6px; width:100%; text-align:center; font-size:10px; font-weight:700; color:#fff; }
     .timeline { height:72px; border-radius:16px; background:#ffffffcf; border:1px solid #e5e7eb; padding:8px; display:flex; gap:8px; overflow:hidden; }
     .noteBlock { min-width:12%; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; box-shadow: var(--shadow); }
@@ -587,6 +587,7 @@
           <div>
             <span style="font-weight: 600; margin-right: 12px;">Difficulty:</span>
             <button class="pill active" id="easyMode">Easy</button>
+            <button class="pill" id="mediumMode">Medium</button>
             <button class="pill" id="strictMode">Strict</button>
           </div>
         </div>
@@ -800,66 +801,66 @@ const SONGS = {
   // New Easy Songs
   oldMacdonaldEasy: {
     title: 'Old MacDonald Had a Farm (Easy)',
-    notes: ['C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4']
+    notes: ['G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4']
   },
   oldMacdonald: {
     title: 'Old MacDonald Had a Farm',
-    notes: ['C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4','G4','G4','F4','F4','E4','E4','D4','G4','G4','F4','F4','E4','E4','D4','C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4']
+    notes: ['G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4','D4','G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4','D4','D4','G4','G4','G4','D4','D4','G4','G4','G4','G4','G4','G4','G4','G4','G4','G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4']
   },
   
   wheelsOnBusEasy: {
     title: 'The Wheels on the Bus (Easy)',
-    notes: ['C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['C4','F4','F4','F4','F4','A4','C5','A4','F4','G4','C4','C4','F4']
   },
   wheelsOnBus: {
     title: 'The Wheels on the Bus',
-    notes: ['C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4','G4','G4','F4','F4','E4','E4','D4','D4','G4','G4','F4','F4','E4','E4','D4','D4','C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['C4','F4','F4','F4','F4','A4','C5','A4','F4','G4','E4','C4','A4','G4','F4','C4','F4','F4','F4','F4','A4','C5','A4','F4','G4','C4','C4','F4']
   },
   
   babySharkEasy: {
     title: 'Baby Shark (Easy)',
-    notes: ['C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4']
   },
   babyShark: {
     title: 'Baby Shark',
-    notes: ['C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4','C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4','D4','E4','F4','G4','A4','A4','A4','A4','B4','A4','G4','F4','E4','D4']
+    notes: ['D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4']
   },
   
   humptyDumptyEasy: {
     title: 'Humpty Dumpty (Easy)',
-    notes: ['C4','D4','E4','C4','E4','D4','C4','D4','E4','F4','G4','G4']
+    notes: ['E4','G4','F4','A4','G4','A4','B4','C5','E4','G4','F4','A4','G4','E4','C4','D4','E4','E4','G4','F4','F4','G4','G4','A4','B4','C5','E5','E5','C5','F5','F5','E5','D5','C5','B4','C5']
   },
   humptyDumpty: {
     title: 'Humpty Dumpty',
-    notes: ['C4','D4','E4','C4','E4','D4','C4','D4','E4','F4','G4','G4','G4','F4','E4','D4','C4','C4','G4','G4','F4','E4','D4','C4','D4','E4','F4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['E4','G4','F4','A4','G4','A4','B4','C5','E4','G4','F4','A4','G4','E4','C4','D4','E4','E4','G4','F4','F4','G4','G4','A4','B4','C5','E5','E5','C5','F5','F5','E5','D5','C5','B4','C5','E4','G4','F4','A4','G4','A4','B4','C5','E4','G4','F4','A4','G4','E4','C4','D4','E4','E4','G4','F4','F4','G4','G4','A4','B4','C5','E5','E5','C5','F5','F5','E5','D5','C5','B4','C5']
   },
   
   baaBlackSheepEasy: {
     title: 'Baa Baa Black Sheep (Easy)',
-    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+    notes: ['C4','C4','G4','G4','A4','A4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
   },
   baaBlackSheep: {
     title: 'Baa Baa Black Sheep',
-    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4','G4','G4','F4','F4','E4','E4','D4','G4','G4','F4','F4','E4','E4','D4','C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+    notes: ['C4','C4','G4','G4','A4','A4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4','G4','G4','G4','F4','F4','E4','E4','E4','D4','C4','G4','G4','G4','F4','F4','F4','F4','E4','E4','E4','D4']
   },
   
   itsySpiderEasy: {
     title: 'Itsy Bitsy Spider (Easy)',
-    notes: ['G4','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4']
+    notes: ['G3','C4','C4','C4','D4','E4','E4','E4','D4','C4','D4','E4','C4']
   },
   itsySpider: {
     title: 'Itsy Bitsy Spider',
-    notes: ['G4','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4','E4','E4','E4','F4','G4','G4','F4','E4','G4','C5','C5','G4','G4','G4','A4','B4','B4','A4','G4','B4','C5','C5','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4']
+    notes: ['G3','C4','C4','C4','D4','E4','E4','E4','D4','C4','D4','E4','C4','E4','E4','F4','G4','G4','F4','E4','F4','G4','E4','C4','C4','D4','E4','E4','D4','C4','D4','E4','C4','G3','G3','C4','C4','C4','D4','E4','E4','E4','D4','C4','D4','E4','C4']
   },
   
   rowBoatEasy: {
     title: 'Row Row Row Your Boat (Easy)',
-    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','G4','G4']
+    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4']
   },
   rowBoat: {
     title: 'Row Row Row Your Boat',
-    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4','G4','F4','E4','D4','C4']
-  }
+    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4','C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4','C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4']
+  },
 };
 
 // State (session only)
@@ -877,6 +878,7 @@ let state = {
   bestTimes: {},          // per-song best in this session
   lastTimes: {},          // per-song last in this session
   songKey: 'twinkle',
+  strictOctaveRange: [3, 5], // Current 3-octave range for strict mode [low, high]
   expected() { return this.queue[this.idx] || null; },
 };
 
@@ -927,8 +929,9 @@ const backToMenuBtn = el('backToMenuBtn');
 
 // Controls wiring - Updated for new page flow (MIDI only mode)
 el('modeMIDI').onclick = (e)=>{ pick('mode','midi',['modeMIDI'],e)};
-el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','strictMode'],e)};
-el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','strictMode'],e)};
+el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','mediumMode','strictMode'],e)};
+el('mediumMode').onclick = (e)=>{ pick('difficulty','medium',['easyMode','mediumMode','strictMode'],e)};
+el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','mediumMode','strictMode'],e)};
 el('audioOn').onclick = (e)=>{ pick('audioEnabled',true,['audioOn'],e)};
 
 // New page navigation
@@ -997,6 +1000,10 @@ function swap(hide,show){ hide.classList.add('hidden'); show.classList.remove('h
 
 function reset(){
   state.idx=0; state.finished=false; state.startTime=null; state.elapsed=0; state.timerStarted=false;
+  
+  // Reset strict mode octave range to default when starting a new song
+  state.strictOctaveRange = [3, 5]; // Default 3-octave range
+  
   feedback.textContent = '';
   renderTimeline();
   renderKeyboard();
@@ -1077,7 +1084,7 @@ function renderPrompt(){
   const exp = state.expected();
   if(!exp){ prompt.textContent = state.finished ? `All done${state.name?`, ${state.name}`:''}!` : ''; return; }
   const color = COLOR_NAME[exp.stepWhite];
-  prompt.textContent = `Press: ${toLabel(exp, state.difficulty==='strict')} (${color})`;
+  prompt.textContent = `Press: ${toLabel(exp, state.difficulty==='strict' || state.difficulty==='medium')} (${color})`;
   renderKeyboard(exp);
 }
 
@@ -1119,7 +1126,7 @@ function buildKey(step, octave, active, isBlack = false){
   
   const l = document.createElement('div'); 
   l.className='lbl'; 
-  l.textContent = step+(state.difficulty==='strict'?octave:'');
+  l.textContent = step+(state.difficulty==='strict' || state.difficulty==='medium'?octave:'');
   
   // Make black key labels more visible in strict mode
   if(isBlack && state.difficulty === 'strict') {
@@ -1147,11 +1154,11 @@ function buildOctaveKeys(octave, active) {
   // Add black keys positioned between white keys
   // Use percentage-based positioning that works with flexbox layout
   const blackPositions = [
-    { leftPercent: 'calc(14.28% - 15px)', step: 'C#' }, // Between C and D
-    { leftPercent: 'calc(28.56% - 15px)', step: 'D#' }, // Between D and E  
-    { leftPercent: 'calc(57.12% - 15px)', step: 'F#' }, // Between F and G
-    { leftPercent: 'calc(71.4% - 15px)', step: 'G#' },  // Between G and A
-    { leftPercent: 'calc(85.68% - 15px)', step: 'A#' }  // Between A and B
+    { leftPercent: 'calc(14.28% - 14px)', step: 'C#' }, // Between C and D
+    { leftPercent: 'calc(28.56% - 14px)', step: 'D#' }, // Between D and E  
+    { leftPercent: 'calc(57.12% - 14px)', step: 'F#' }, // Between F and G
+    { leftPercent: 'calc(71.4% - 14px)', step: 'G#' },  // Between G and A
+    { leftPercent: 'calc(85.68% - 14px)', step: 'A#' }  // Between A and B
   ];
   
   blackPositions.forEach(({ leftPercent, step }) => {
@@ -1174,21 +1181,60 @@ function renderKeyboard(active){
   kbd.innerHTML='';
   if(state.difficulty==='easy'){
     kbd.appendChild(buildOctaveKeys(4, active));
-  } else {
-    // In strict mode, use MIDI device range if available, otherwise use song range
-    let [low, high] = songRange();
+  } else if(state.difficulty==='medium'){
+    // Medium: adaptive 3-octave display based on song range
+    let [songLow, songHigh] = songRange();
+    let low = 3, high = 5; // default to 3-5
     
-    if (state.mode === 'midi') {
-      const [midiLow, midiHigh] = getMIDIDeviceOctaveRange();
-      // Use MIDI device range if it's been detected and is reasonable
-      if (midiHigh > midiLow && midiHigh - midiLow <= 7) {
-        low = midiLow;
-        high = midiHigh;
-      }
+    // If song goes above octave 5, shift the range up
+    if (songHigh > 5) {
+      high = Math.min(7, songHigh);
+      low = Math.max(1, high - 2);
+    }
+    // If song goes below octave 3, shift the range down  
+    else if (songLow < 3) {
+      low = Math.max(1, songLow);
+      high = Math.min(7, low + 2);
     }
     
-    for(let o = low; o<=high; o++){ 
+    for(let o = low; o <= high; o++){ 
       kbd.appendChild(buildOctaveKeys(o, active));
+    }
+  } else {
+    // Strict mode: adaptive 3-octave display that only updates when notes go outside current view
+    updateStrictOctaveRange(active);
+    const [low, high] = state.strictOctaveRange;
+    
+    for(let o = low; o <= high; o++){ 
+      kbd.appendChild(buildOctaveKeys(o, active));
+    }
+  }
+}
+
+function updateStrictOctaveRange(expectedNote) {
+  if (!expectedNote) return;
+  
+  const [currentLow, currentHigh] = state.strictOctaveRange;
+  const targetOctave = expectedNote.octave;
+  
+  // Check if the target note is outside the current displayed range
+  if (targetOctave < currentLow || targetOctave > currentHigh) {
+    // Calculate new range centered around the target note
+    let newLow = targetOctave - 1; // Put target in middle octave
+    let newHigh = targetOctave + 1;
+    
+    // Clamp to valid octave range (1-7)
+    if (newLow < 1) {
+      newLow = 1;
+      newHigh = Math.min(7, newLow + 2);
+    } else if (newHigh > 7) {
+      newHigh = 7;
+      newLow = Math.max(1, newHigh - 2);
+    }
+    
+    // Update the range only if it actually changed
+    if (newLow !== currentLow || newHigh !== currentHigh) {
+      state.strictOctaveRange = [newLow, newHigh];
     }
   }
 }
@@ -1748,6 +1794,11 @@ function handleIncomingMidi(midi, fromMicrophone = false){
   if(state.difficulty==='easy'){
     if(got.stepWhite===exp.stepWhite){ onCorrect(exp, 4); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
+  } else if(state.difficulty==='medium'){
+    // Medium: ignore sharps/flats but require correct octave
+    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
+    else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
+    else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   } else {
     if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
     else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
@@ -1762,8 +1813,9 @@ function onCorrect(expectedNote, octave){
     state.timerStarted = true;
   }
   
-  // Play the original MIDI note sound (preserving sharps/flats) instead of the simplified stepWhite
-  playNoteTone(expectedNote.originalStep || expectedNote.step, expectedNote.octave);
+  // Play the original MIDI note sound (preserving sharps/flats and octave) instead of the simplified stepWhite
+  const soundOctave = expectedNote.originalOctave || expectedNote.octave;
+  playNoteTone(expectedNote.originalStep || expectedNote.step, soundOctave);
   
   state.idx++; 
   
@@ -1922,7 +1974,17 @@ function postProcessSequence(seq){
       step:n.stepWhite, 
       stepWhite:n.stepWhite, 
       originalStep:n.step,  // Preserve original note for sound playback
-      octave:4
+      originalOctave:n.octave, // Preserve original octave for sound playback
+      octave:4  // Display octave for easy mode
+    })); 
+  } else if(state.difficulty==='medium'){
+    // Medium: ignore sharps/flats like easy mode, but keep octaves like strict mode
+    return seq.map(n=>({
+      step:n.stepWhite, 
+      stepWhite:n.stepWhite, 
+      originalStep:n.step,  // Preserve original note for sound playback
+      originalOctave:n.octave, // Preserve original octave for sound playback
+      octave: Math.min(7, Math.max(1, n.octave||4))
     })); 
   }
   // strict: keep sharps/flats and octave (clamp 1..7)

@@ -1177,8 +1177,22 @@ function renderKeyboard(active){
   if(state.difficulty==='easy'){
     kbd.appendChild(buildOctaveKeys(4, active));
   } else if(state.difficulty==='medium'){
-    // Medium: show C3-B5 (octaves 3, 4, 5)
-    for(let o = 3; o <= 5; o++){ 
+    // Medium: adaptive 3-octave display based on song range
+    let [songLow, songHigh] = songRange();
+    let low = 3, high = 5; // default to 3-5
+    
+    // If song goes above octave 5, shift the range up
+    if (songHigh > 5) {
+      high = Math.min(7, songHigh);
+      low = Math.max(1, high - 2);
+    }
+    // If song goes below octave 3, shift the range down  
+    else if (songLow < 3) {
+      low = Math.max(1, songLow);
+      high = Math.min(7, low + 2);
+    }
+    
+    for(let o = low; o <= high; o++){ 
       kbd.appendChild(buildOctaveKeys(o, active));
     }
   } else {

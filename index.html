@@ -587,6 +587,7 @@
           <div>
             <span style="font-weight: 600; margin-right: 12px;">Difficulty:</span>
             <button class="pill active" id="easyMode">Easy</button>
+            <button class="pill" id="mediumMode">Medium</button>
             <button class="pill" id="strictMode">Strict</button>
           </div>
         </div>
@@ -800,66 +801,66 @@ const SONGS = {
   // New Easy Songs
   oldMacdonaldEasy: {
     title: 'Old MacDonald Had a Farm (Easy)',
-    notes: ['C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4']
+    notes: ['G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4']
   },
   oldMacdonald: {
     title: 'Old MacDonald Had a Farm',
-    notes: ['C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4','G4','G4','F4','F4','E4','E4','D4','G4','G4','F4','F4','E4','E4','D4','C4','C4','C4','G4','A4','A4','G4','E4','E4','D4','D4','C4']
+    notes: ['G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4','D4','G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4','D4','D4','G4','G4','G4','D4','D4','G4','G4','G4','G4','G4','G4','G4','G4','G4','G4','G4','G4','D4','E4','E4','D4','B4','B4','A4','A4','G4']
   },
   
   wheelsOnBusEasy: {
     title: 'The Wheels on the Bus (Easy)',
-    notes: ['C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['C4','F4','F4','F4','F4','A4','C5','A4','F4','G4','C4','C4','F4']
   },
   wheelsOnBus: {
     title: 'The Wheels on the Bus',
-    notes: ['C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4','G4','G4','F4','F4','E4','E4','D4','D4','G4','G4','F4','F4','E4','E4','D4','D4','C4','C4','C4','C4','G4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['C4','F4','F4','F4','F4','A4','C5','A4','F4','G4','E4','C4','A4','G4','F4','C4','F4','F4','F4','F4','A4','C5','A4','F4','G4','C4','C4','F4']
   },
   
   babySharkEasy: {
     title: 'Baby Shark (Easy)',
-    notes: ['C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4']
   },
   babyShark: {
     title: 'Baby Shark',
-    notes: ['C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4','C4','D4','E4','F4','G4','G4','G4','G4','A4','G4','F4','E4','D4','C4','D4','E4','F4','G4','A4','A4','A4','A4','B4','A4','G4','F4','E4','D4']
+    notes: ['D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','D4','E4','G4','G4','G4','G4','G4','G4','G4','G4','G4','F#4']
   },
   
   humptyDumptyEasy: {
     title: 'Humpty Dumpty (Easy)',
-    notes: ['C4','D4','E4','C4','E4','D4','C4','D4','E4','F4','G4','G4']
+    notes: ['E4','G4','F4','A4','G4','A4','B4','C5','E4','G4','F4','A4','G4','E4','C4','D4','E4','E4','G4','F4','F4','G4','G4','A4','B4','C5','E5','E5','C5','F5','F5','E5','D5','C5','B4','C5']
   },
   humptyDumpty: {
     title: 'Humpty Dumpty',
-    notes: ['C4','D4','E4','C4','E4','D4','C4','D4','E4','F4','G4','G4','G4','F4','E4','D4','C4','C4','G4','G4','F4','E4','D4','C4','D4','E4','F4','G4','A4','G4','F4','E4','D4','C4']
+    notes: ['E4','G4','F4','A4','G4','A4','B4','C5','E4','G4','F4','A4','G4','E4','C4','D4','E4','E4','G4','F4','F4','G4','G4','A4','B4','C5','E5','E5','C5','F5','F5','E5','D5','C5','B4','C5','E4','G4','F4','A4','G4','A4','B4','C5','E4','G4','F4','A4','G4','E4','C4','D4','E4','E4','G4','F4','F4','G4','G4','A4','B4','C5','E5','E5','C5','F5','F5','E5','D5','C5','B4','C5']
   },
   
   baaBlackSheepEasy: {
     title: 'Baa Baa Black Sheep (Easy)',
-    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+    notes: ['C4','C4','G4','G4','A4','A4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
   },
   baaBlackSheep: {
     title: 'Baa Baa Black Sheep',
-    notes: ['C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4','G4','G4','F4','F4','E4','E4','D4','G4','G4','F4','F4','E4','E4','D4','C4','C4','G4','G4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4']
+    notes: ['C4','C4','G4','G4','A4','A4','A4','A4','G4','F4','F4','E4','E4','D4','D4','C4','G4','G4','G4','F4','F4','E4','E4','E4','D4','C4','G4','G4','G4','F4','F4','F4','F4','E4','E4','E4','D4']
   },
   
   itsySpiderEasy: {
     title: 'Itsy Bitsy Spider (Easy)',
-    notes: ['G4','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4']
+    notes: ['G3','C4','C4','C4','D4','E4','E4','E4','D4','C4','D4','E4','C4']
   },
   itsySpider: {
     title: 'Itsy Bitsy Spider',
-    notes: ['G4','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4','E4','E4','E4','F4','G4','G4','F4','E4','G4','C5','C5','G4','G4','G4','A4','B4','B4','A4','G4','B4','C5','C5','C4','C4','C4','D4','E4','E4','D4','C4','E4','G4','G4']
+    notes: ['G3','C4','C4','C4','D4','E4','E4','E4','D4','C4','D4','E4','C4','E4','E4','F4','G4','G4','F4','E4','F4','G4','E4','C4','C4','D4','E4','E4','D4','C4','D4','E4','C4','G3','G3','C4','C4','C4','D4','E4','E4','E4','D4','C4','D4','E4','C4']
   },
   
   rowBoatEasy: {
     title: 'Row Row Row Your Boat (Easy)',
-    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','G4','G4']
+    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4']
   },
   rowBoat: {
     title: 'Row Row Row Your Boat',
-    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4','G4','F4','E4','D4','C4']
-  }
+    notes: ['C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4','C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4','C4','C4','C4','D4','E4','E4','D4','E4','F4','G4','C5','C5','C5','G4','G4','G4','E4','E4','E4','C4','C4','C4','G4','F4','E4','D4','C4']
+  },
 };
 
 // State (session only)
@@ -927,8 +928,9 @@ const backToMenuBtn = el('backToMenuBtn');
 
 // Controls wiring - Updated for new page flow (MIDI only mode)
 el('modeMIDI').onclick = (e)=>{ pick('mode','midi',['modeMIDI'],e)};
-el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','strictMode'],e)};
-el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','strictMode'],e)};
+el('easyMode').onclick = (e)=>{ pick('difficulty','easy',['easyMode','mediumMode','strictMode'],e)};
+el('mediumMode').onclick = (e)=>{ pick('difficulty','medium',['easyMode','mediumMode','strictMode'],e)};
+el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','mediumMode','strictMode'],e)};
 el('audioOn').onclick = (e)=>{ pick('audioEnabled',true,['audioOn'],e)};
 
 // New page navigation
@@ -1077,7 +1079,7 @@ function renderPrompt(){
   const exp = state.expected();
   if(!exp){ prompt.textContent = state.finished ? `All done${state.name?`, ${state.name}`:''}!` : ''; return; }
   const color = COLOR_NAME[exp.stepWhite];
-  prompt.textContent = `Press: ${toLabel(exp, state.difficulty==='strict')} (${color})`;
+  prompt.textContent = `Press: ${toLabel(exp, state.difficulty==='strict' || state.difficulty==='medium')} (${color})`;
   renderKeyboard(exp);
 }
 
@@ -1119,7 +1121,7 @@ function buildKey(step, octave, active, isBlack = false){
   
   const l = document.createElement('div'); 
   l.className='lbl'; 
-  l.textContent = step+(state.difficulty==='strict'?octave:'');
+  l.textContent = step+(state.difficulty==='strict' || state.difficulty==='medium'?octave:'');
   
   // Make black key labels more visible in strict mode
   if(isBlack && state.difficulty === 'strict') {
@@ -1174,6 +1176,11 @@ function renderKeyboard(active){
   kbd.innerHTML='';
   if(state.difficulty==='easy'){
     kbd.appendChild(buildOctaveKeys(4, active));
+  } else if(state.difficulty==='medium'){
+    // Medium: show C3-B5 (octaves 3, 4, 5)
+    for(let o = 3; o <= 5; o++){ 
+      kbd.appendChild(buildOctaveKeys(o, active));
+    }
   } else {
     // In strict mode, use MIDI device range if available, otherwise use song range
     let [low, high] = songRange();
@@ -1748,6 +1755,11 @@ function handleIncomingMidi(midi, fromMicrophone = false){
   if(state.difficulty==='easy'){
     if(got.stepWhite===exp.stepWhite){ onCorrect(exp, 4); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
+  } else if(state.difficulty==='medium'){
+    // Medium: ignore sharps/flats but require correct octave
+    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
+    else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
+    else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   } else {
     if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
     else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
@@ -1762,8 +1774,9 @@ function onCorrect(expectedNote, octave){
     state.timerStarted = true;
   }
   
-  // Play the original MIDI note sound (preserving sharps/flats) instead of the simplified stepWhite
-  playNoteTone(expectedNote.originalStep || expectedNote.step, expectedNote.octave);
+  // Play the original MIDI note sound (preserving sharps/flats and octave) instead of the simplified stepWhite
+  const soundOctave = expectedNote.originalOctave || expectedNote.octave;
+  playNoteTone(expectedNote.originalStep || expectedNote.step, soundOctave);
   
   state.idx++; 
   
@@ -1922,7 +1935,17 @@ function postProcessSequence(seq){
       step:n.stepWhite, 
       stepWhite:n.stepWhite, 
       originalStep:n.step,  // Preserve original note for sound playback
-      octave:4
+      originalOctave:n.octave, // Preserve original octave for sound playback
+      octave:4  // Display octave for easy mode
+    })); 
+  } else if(state.difficulty==='medium'){
+    // Medium: ignore sharps/flats like easy mode, but keep octaves like strict mode
+    return seq.map(n=>({
+      step:n.stepWhite, 
+      stepWhite:n.stepWhite, 
+      originalStep:n.step,  // Preserve original note for sound playback
+      originalOctave:n.octave, // Preserve original octave for sound playback
+      octave: Math.min(7, Math.max(1, n.octave||4))
     })); 
   }
   // strict: keep sharps/flats and octave (clamp 1..7)

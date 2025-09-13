@@ -1118,6 +1118,9 @@ function buildKey(step, octave, active, isBlack = false){
   // Add click handler for direct key interaction
   d.style.cursor = 'pointer';
   d.addEventListener('click', () => {
+    // Always play the sound for the clicked key (like a real piano)
+    playNoteTone(step, octave);
+    
     const noteStep = step.replace('#', '');
     const noteIndex = STEPS.indexOf(step);
     const midiNote = (octave + 1) * 12 + noteIndex;

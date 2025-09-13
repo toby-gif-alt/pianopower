@@ -1,4 +1,4 @@
-# PianoPal 🎹 - Child-Friendly Piano Learning
+# Piano Power! 🎹 - Child-Friendly Piano Learning
 
 A fun, single-file kids piano trainer perfect for GitHub Pages deployment! Features a beautiful 3-page child-friendly interface with engaging animations.
 

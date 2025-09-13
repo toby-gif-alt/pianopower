@@ -935,35 +935,41 @@ el('strictMode').onclick = (e)=>{ pick('difficulty','strict',['easyMode','medium
 el('audioOn').onclick = (e)=>{ pick('audioEnabled',true,['audioOn'],e)};
 
 // New page navigation
-el('nextToSongs').onclick = ()=>{ 
+el('nextToSongs').onclick = async ()=>{ 
   state.name = el('name').value.trim(); 
+  
+  // Unlock audio context on user interaction for iOS/iPad
+  if (!audioContextUnlocked) {
+    await unlockAudioContext();
+  }
+  
   swap(welcome, songSelection); 
 };
 el('backToWelcome').onclick = ()=>{ swap(songSelection, welcome); };
-el('chooseTwinkle').onclick = ()=>{ startGameWithSong('twinkle'); };
-el('chooseMary').onclick = ()=>{ startGameWithSong('mary'); };
-el('chooseLetItGo').onclick = ()=>{ startGameWithSong('letitgo'); };
-el('chooseTwinkleEasy').onclick = ()=>{ startGameWithSong('twinkleEasy'); };
-el('chooseMaryEasy').onclick = ()=>{ startGameWithSong('maryEasy'); };
+el('chooseTwinkle').onclick = async ()=>{ await startGameWithSong('twinkle'); };
+el('chooseMary').onclick = async ()=>{ await startGameWithSong('mary'); };
+el('chooseLetItGo').onclick = async ()=>{ await startGameWithSong('letitgo'); };
+el('chooseTwinkleEasy').onclick = async ()=>{ await startGameWithSong('twinkleEasy'); };
+el('chooseMaryEasy').onclick = async ()=>{ await startGameWithSong('maryEasy'); };
 
 // New Easy Song Handlers
-el('chooseOldMacdonaldEasy').onclick = ()=>{ startGameWithSong('oldMacdonaldEasy'); };
-el('chooseWheelsOnBusEasy').onclick = ()=>{ startGameWithSong('wheelsOnBusEasy'); };
-el('chooseBabySharkEasy').onclick = ()=>{ startGameWithSong('babySharkEasy'); };
-el('chooseHumptyDumptyEasy').onclick = ()=>{ startGameWithSong('humptyDumptyEasy'); };
-el('chooseBaaBlackSheepEasy').onclick = ()=>{ startGameWithSong('baaBlackSheepEasy'); };
-el('chooseItsySpiderEasy').onclick = ()=>{ startGameWithSong('itsySpiderEasy'); };
-el('chooseRowBoatEasy').onclick = ()=>{ startGameWithSong('rowBoatEasy'); };
+el('chooseOldMacdonaldEasy').onclick = async ()=>{ await startGameWithSong('oldMacdonaldEasy'); };
+el('chooseWheelsOnBusEasy').onclick = async ()=>{ await startGameWithSong('wheelsOnBusEasy'); };
+el('chooseBabySharkEasy').onclick = async ()=>{ await startGameWithSong('babySharkEasy'); };
+el('chooseHumptyDumptyEasy').onclick = async ()=>{ await startGameWithSong('humptyDumptyEasy'); };
+el('chooseBaaBlackSheepEasy').onclick = async ()=>{ await startGameWithSong('baaBlackSheepEasy'); };
+el('chooseItsySpiderEasy').onclick = async ()=>{ await startGameWithSong('itsySpiderEasy'); };
+el('chooseRowBoatEasy').onclick = async ()=>{ await startGameWithSong('rowBoatEasy'); };
 
 // New Full Song Handlers
-el('chooseOldMacdonald').onclick = ()=>{ startGameWithSong('oldMacdonald'); };
-el('chooseWheelsOnBus').onclick = ()=>{ startGameWithSong('wheelsOnBus'); };
-el('chooseBabyShark').onclick = ()=>{ startGameWithSong('babyShark'); };
-el('chooseHumptyDumpty').onclick = ()=>{ startGameWithSong('humptyDumpty'); };
-el('chooseBaaBlackSheep').onclick = ()=>{ startGameWithSong('baaBlackSheep'); };
-el('chooseItsySpider').onclick = ()=>{ startGameWithSong('itsySpider'); };
-el('chooseRowBoat').onclick = ()=>{ startGameWithSong('rowBoat'); };
-el('startWithUpload').onclick = ()=>{ 
+el('chooseOldMacdonald').onclick = async ()=>{ await startGameWithSong('oldMacdonald'); };
+el('chooseWheelsOnBus').onclick = async ()=>{ await startGameWithSong('wheelsOnBus'); };
+el('chooseBabyShark').onclick = async ()=>{ await startGameWithSong('babyShark'); };
+el('chooseHumptyDumpty').onclick = async ()=>{ await startGameWithSong('humptyDumpty'); };
+el('chooseBaaBlackSheep').onclick = async ()=>{ await startGameWithSong('baaBlackSheep'); };
+el('chooseItsySpider').onclick = async ()=>{ await startGameWithSong('itsySpider'); };
+el('chooseRowBoat').onclick = async ()=>{ await startGameWithSong('rowBoat'); };
+el('startWithUpload').onclick = async ()=>{ 
   const file = el('file').files[0];
   if(file) {
     onFile({target: {files: [file]}});
@@ -1012,10 +1018,15 @@ function reset(){
   updateTimes();
 }
 
-function startGameWithSong(songKey) {
+async function startGameWithSong(songKey) {
   state.songKey = songKey;
   const song = SONGS[songKey];
   songTitleLbl.textContent = song.title;
+  
+  // Unlock audio context on user interaction for iOS/iPad
+  if (!audioContextUnlocked) {
+    await unlockAudioContext();
+  }
   
   // Try to load MIDI file first, fall back to hardcoded notes
   if (song.midiFile) {
@@ -1117,14 +1128,19 @@ function buildKey(step, octave, active, isBlack = false){
   
   // Add click handler for direct key interaction
   d.style.cursor = 'pointer';
-  d.addEventListener('click', () => {
+  d.addEventListener('click', async () => {
+    // Unlock audio context on first interaction for iOS/iPad
+    if (!audioContextUnlocked) {
+      await unlockAudioContext();
+    }
+    
     // Always play the sound for the clicked key (like a real piano)
-    playNoteTone(step, octave);
+    await playNoteTone(step, octave);
     
     const noteStep = step.replace('#', '');
     const noteIndex = STEPS.indexOf(step);
     const midiNote = (octave + 1) * 12 + noteIndex;
-    handleIncomingMidi(midiNote);
+    await handleIncomingMidi(midiNote);
   });
   
   const l = document.createElement('div'); 
@@ -1614,10 +1630,10 @@ async function startMIDI(){
   try{
     midiAccess = await navigator.requestMIDIAccess();
     for(const input of midiAccess.inputs.values()){
-      input.addEventListener('midimessage', midiHandler = (e)=>{
+      input.addEventListener('midimessage', midiHandler = async (e)=>{
         const [status, note, vel] = e.data; const on = (status & 0xf0)===0x90 && vel>0; if(!on) return;
         detectMIDIDeviceRange(note);
-        handleIncomingMidi(note);
+        await handleIncomingMidi(note);
       });
     }
   }catch(e){ alert('Web MIDI not supported in this browser. Try Chrome/Edge or use Mic mode.'); }
@@ -1660,7 +1676,7 @@ async function startMic(){
     let lastMicNoteTime = 0;
     const MIC_DEBOUNCE_MS = 150; // Shorter debounce for microphone to feel responsive
     
-    const loop = () => {
+    const loop = async () => {
       if(!running) return;
       analyser.getFloatTimeDomainData(buf);
       const f = autoCorrelate(buf, ctx.sampleRate);
@@ -1671,7 +1687,7 @@ async function startMic(){
           const midi = Math.round(69 + 12 * Math.log2(f / 440));
           // Only process notes in reasonable piano range
           if (midi >= 21 && midi <= 108) {
-            handleIncomingMidi(midi, true);
+            await handleIncomingMidi(midi, true);
             lastMicNoteTime = now;
           }
         }
@@ -1725,6 +1741,7 @@ function autoCorrelate(buf, sr){
 
 // ----- Simple Audio Tone System -----
 let audioContext = null;
+let audioContextUnlocked = false;
 
 function initAudioContext() {
   if (!audioContext && state.audioEnabled) {
@@ -1733,15 +1750,60 @@ function initAudioContext() {
   return audioContext;
 }
 
-function playNoteTone(step, octave) {
+// Function to unlock audio context on iOS/iPad - must be called from user interaction
+async function unlockAudioContext() {
+  if (audioContextUnlocked) return true;
+  
+  const ctx = initAudioContext();
+  if (!ctx) return false;
+  
+  try {
+    // Create a silent sound to unlock the audio context on iOS
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+    
+    // Play a brief silent sound to fully unlock on iOS
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
+    oscillator.type = 'sine';
+    gainNode.gain.setValueAtTime(0, ctx.currentTime); // Silent
+    
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.01);
+    
+    audioContextUnlocked = true;
+    return true;
+  } catch (error) {
+    console.warn('Failed to unlock audio context:', error);
+    return false;
+  }
+}
+
+async function playNoteTone(step, octave) {
   if (!state.audioEnabled) return;
   
   const ctx = initAudioContext();
   if (!ctx) return;
   
+  // Ensure audio context is unlocked on iOS/iPad
+  if (!audioContextUnlocked) {
+    await unlockAudioContext();
+  }
+  
   // Resume audio context if suspended (browser policy)
   if (ctx.state === 'suspended') {
-    ctx.resume();
+    try {
+      await ctx.resume();
+    } catch (error) {
+      console.warn('Failed to resume audio context:', error);
+      return;
+    }
   }
   
   // Calculate frequency for any note including sharps/flats
@@ -1783,7 +1845,7 @@ function playNoteTone(step, octave) {
 let lastNoteTime = 0;
 const NOTE_DEBOUNCE_MS = 250; // Minimum time between notes to prevent accidental double notes
 
-function handleIncomingMidi(midi, fromMicrophone = false){
+async function handleIncomingMidi(midi, fromMicrophone = false){
   const exp = state.expected(); if(!exp) return;
   
   // Debouncing to prevent accidental double notes
@@ -1795,21 +1857,21 @@ function handleIncomingMidi(midi, fromMicrophone = false){
   
   const got = fromMidi(midi);
   if(state.difficulty==='easy'){
-    if(got.stepWhite===exp.stepWhite){ onCorrect(exp, 4); }
+    if(got.stepWhite===exp.stepWhite){ await onCorrect(exp, 4); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   } else if(state.difficulty==='medium'){
     // Medium: ignore sharps/flats but require correct octave
-    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
+    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ await onCorrect(exp, got.octave); }
     else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   } else {
-    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ onCorrect(exp, got.octave); }
+    if(got.stepWhite===exp.stepWhite && got.octave===exp.octave){ await onCorrect(exp, got.octave); }
     else if(got.stepWhite===exp.stepWhite){ onWrong(`${dir(exp.octave, got.octave)}, ${state.name?state.name+' ':''}try again!`); }
     else { onWrong(`${sayWrong()}, ${state.name?state.name+' ':''}try again!`); }
   }
 }
 
-function onCorrect(expectedNote, octave){
+async function onCorrect(expectedNote, octave){
   // Start timer on first note press
   if(!state.timerStarted) {
     startTimer();
@@ -1818,7 +1880,7 @@ function onCorrect(expectedNote, octave){
   
   // Play the original MIDI note sound (preserving sharps/flats and octave) instead of the simplified stepWhite
   const soundOctave = expectedNote.originalOctave || expectedNote.octave;
-  playNoteTone(expectedNote.originalStep || expectedNote.step, soundOctave);
+  await playNoteTone(expectedNote.originalStep || expectedNote.step, soundOctave);
   
   state.idx++; 
   

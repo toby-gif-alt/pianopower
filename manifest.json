@@ -1,0 +1,16 @@
+{
+  "name": "Piano Power!",
+  "short_name": "PianoPower", 
+  "icons": [
+    {
+      "src": "pianopower.png",
+      "sizes": "2048x2048",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#ff6b6b",
+  "background_color": "#e0f2fe",
+  "display": "standalone",
+  "start_url": "/"
+}
